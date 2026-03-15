@@ -1,0 +1,20 @@
+### 1. Create Admin User
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "admin@restaurant.com",
+  "password": "admin123",
+  "role": "admin"
+}
+
+### 2. Add a Table 
+POST http://localhost:5000/api/tables
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YjY0ZTc1NmVlNmFmMjkzYzU1Y2QzZSIsImlhdCI6MTc3MzU1NTMxNywiZXhwIjoxNzc2MTQ3MzE3fQ.XxKZHaKClBcpQisU0RCJWvizWYe7ht4ZwwIhLO3ymjk
+
+{
+  "tableNumber": 1,
+  "capacity": 4
+}

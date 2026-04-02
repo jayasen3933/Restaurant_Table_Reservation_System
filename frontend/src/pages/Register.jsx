@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { UserPlus } from 'lucide-react';
+import { UtensilsCrossed } from 'lucide-react';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -53,30 +53,40 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen restaurant-bg flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&q=80')] bg-cover bg-center opacity-15" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
+
+      <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-lg mb-4">
-            <UserPlus size={24} className="text-gray-700" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-700/30 backdrop-blur-sm rounded-full mb-5 border border-amber-600/30">
+            <UtensilsCrossed size={28} className="text-amber-400" />
           </div>
-          <h1 className="text-3xl font-medium text-gray-900 mb-2">
-            Create Account
+          <h1 className="font-serif text-4xl font-semibold text-white mb-2 tracking-wide">
+            Join Us
           </h1>
-          <p className="text-gray-600">
-            Sign up to start making reservations
+          <p className="text-amber-200/70 text-sm tracking-widest uppercase">
+            Create your account
           </p>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-8">
+        <div className="glass-card rounded-2xl p-8">
+          <h2 className="font-serif text-2xl font-medium text-stone-800 mb-1 text-center">
+            Create Account
+          </h2>
+          <p className="text-stone-500 text-sm text-center mb-6">
+            Sign up to start making reservations
+          </p>
+
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
                 Full Name
               </label>
               <input
@@ -85,14 +95,14 @@ const Register = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                className="input-restaurant"
                 placeholder="John Doe"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
+                Email Address
               </label>
               <input
                 type="email"
@@ -100,13 +110,13 @@ const Register = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                className="input-restaurant"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
                 Password
               </label>
               <input
@@ -115,13 +125,13 @@ const Register = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                className="input-restaurant"
                 placeholder="••••••••"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
                 Confirm Password
               </label>
               <input
@@ -130,7 +140,7 @@ const Register = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                className="input-restaurant"
                 placeholder="••••••••"
               />
             </div>
@@ -138,16 +148,16 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors font-medium disabled:opacity-50"
+              className="w-full btn-primary disabled:opacity-50 text-center"
             >
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-stone-500">
               Already have an account?{' '}
-              <Link to="/login" className="text-gray-900 hover:underline font-medium">
+              <Link to="/login" className="text-amber-700 hover:text-amber-800 font-semibold hover:underline">
                 Sign in
               </Link>
             </p>

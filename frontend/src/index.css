@@ -4,6 +4,25 @@
 
 @layer base {
   body {
-    @apply font-sans antialiased;
+    @apply font-sans antialiased text-stone-800;
+    background-color: #faf7f2;
+  }
+}
+
+@layer components {
+  .restaurant-bg {
+    background: linear-gradient(135deg, #1a0f0a 0%, #2d1810 40%, #3d241a 70%, #1a0f0a 100%);
+  }
+  .glass-card {
+    @apply bg-white/90 backdrop-blur-sm border border-stone-200/60 shadow-lg;
+  }
+  .input-restaurant {
+    @apply w-full px-4 py-3 bg-stone-50 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-600 transition-all text-stone-800 placeholder-stone-400;
+  }
+  .btn-primary {
+    @apply px-6 py-3 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition-all font-medium shadow-md hover:shadow-lg active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply px-6 py-3 border border-stone-300 text-stone-700 rounded-lg hover:bg-stone-100 transition-all font-medium;
   }
 }

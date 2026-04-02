@@ -4,7 +4,8 @@ const {
   getUserById,
   updateUserRole,
   deleteUser,
-  getStats
+  getStats,
+  cleanupDatabase
 } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -14,6 +15,7 @@ router.use(protect);
 router.use(authorize('admin'));
 
 router.get('/stats', getStats);
+router.post('/cleanup', cleanupDatabase);
 router.route('/')
   .get(getAllUsers);
 

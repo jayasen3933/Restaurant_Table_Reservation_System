@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { reservationService } from '../api/reservationService';
-import { Calendar, Clock, Users, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, Users, CheckCircle, UtensilsCrossed } from 'lucide-react';
 
 const Booking = () => {
   const location = useLocation();
@@ -81,19 +81,23 @@ const Booking = () => {
 
   if (bookingSuccess) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center p-8">
-          <CheckCircle size={64} className="mx-auto text-green-600 mb-4" />
-          <h2 className="text-3xl font-medium text-gray-900 mb-4">
+      <div className="min-h-screen flex items-center justify-center relative">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=1920&q=80')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-stone-900/85" />
+        <div className="max-w-md mx-auto text-center p-8 relative z-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-emerald-600/20 backdrop-blur-sm rounded-full mb-6 border border-emerald-500/30">
+            <CheckCircle size={40} className="text-emerald-400" />
+          </div>
+          <h2 className="font-serif text-4xl font-semibold text-white mb-4">
             Reservation Confirmed!
           </h2>
-          <p className="text-gray-600 mb-6">
-            Your table has been reserved for {searchParams.date} at {searchParams.time}.
-            A confirmation email has been sent to {contactInfo.email}.
+          <p className="text-stone-300 mb-8 leading-relaxed">
+            Your table has been reserved for <span className="text-amber-400 font-medium">{searchParams.date}</span> at <span className="text-amber-400 font-medium">{searchParams.time}</span>.
+            A confirmation will be sent to <span className="text-amber-400 font-medium">{contactInfo.email}</span>.
           </p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
+            className="btn-primary text-center"
           >
             Make Another Reservation
           </button>
@@ -103,103 +107,111 @@ const Booking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-medium text-gray-900 mb-4">
+    <div className="min-h-screen bg-stone-50">
+      <div className="bg-stone-900 py-10">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="font-serif text-4xl font-semibold text-white mb-4">
               Available Tables
             </h1>
-            <div className="flex items-center gap-6 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-2 text-amber-300">
                 <Calendar size={16} />
-                {new Date(searchParams.date).toLocaleDateString()}
+                {new Date(searchParams.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-amber-300">
                 <Clock size={16} />
                 {searchParams.time}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-amber-300">
                 <Users size={16} />
                 {searchParams.partySize} {searchParams.partySize === '1' ? 'Guest' : 'Guests'}
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {!loading && remainingSlots > 0 && remainingSlots < 4 && (
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                ⚠️ Only {remainingSlots} {remainingSlots === 1 ? 'slot' : 'slots'} remaining for this time! Book now before it fills up.
+      <div className="container mx-auto px-4 py-10">
+        <div className="max-w-4xl mx-auto">
+          {!loading && remainingSlots > 0 && remainingSlots < 4 && availableTables.length > 0 && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <p className="text-sm text-amber-800 font-medium">
+                Hurry! Only {availableTables.length} {availableTables.length === 1 ? 'table' : 'tables'} left for this time slot!
+              </p>
+              <p className="text-xs text-amber-700 mt-1">
+                ({remainingSlots} more {remainingSlots === 1 ? 'reservation' : 'reservations'} can be made - max 4 per timeslot)
               </p>
             </div>
           )}
 
           {slotMessage && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-800">
-                {slotMessage}
-              </p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-sm text-red-800">{slotMessage}</p>
             </div>
           )}
 
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading available tables...</p>
+            <div className="text-center py-16">
+              <UtensilsCrossed size={32} className="mx-auto text-amber-600 mb-3 animate-pulse" />
+              <p className="text-stone-500">Finding the perfect table for you...</p>
             </div>
-          ) : availableTables.length === 0 ? (
-            <div className="text-center py-12 border border-gray-200 rounded-lg">
-              <p className="text-gray-600 mb-4">
+          ) : availableTables.length === 0 && !slotMessage ? (
+            <div className="text-center py-16 glass-card rounded-2xl">
+              <p className="text-stone-600 mb-3 text-lg font-medium">
                 No tables available for the selected date and time.
               </p>
-              <button
-                onClick={() => navigate('/')}
-                className="px-6 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
-              >
+              <p className="text-sm text-stone-500 mb-6 max-w-md mx-auto">
+                {remainingSlots > 0 
+                  ? `This timeslot can still accept ${remainingSlots} more reservations, but all suitable tables are currently booked.`
+                  : 'This timeslot is fully booked (maximum 4 reservations reached).'}
+              </p>
+              <button onClick={() => navigate('/')} className="btn-primary text-center">
                 Try Different Date/Time
               </button>
             </div>
-          ) : (
+          ) : availableTables.length === 0 && slotMessage ? null : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {!showContactForm ? (
                 availableTables.map((table) => (
                   <div
                     key={table._id}
-                    className="border border-gray-200 rounded-lg p-6 hover:border-gray-400 hover:shadow-sm transition-all cursor-pointer"
+                    className="glass-card rounded-2xl p-6 hover:shadow-xl hover:border-amber-300 transition-all cursor-pointer group"
                     onClick={() => handleTableSelect(table)}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-xl font-medium text-gray-900">
+                        <h3 className="font-serif text-xl font-semibold text-stone-800 group-hover:text-amber-800 transition-colors">
                           Table {table.tableNumber}
                         </h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Capacity: {table.capacity} guests
+                        <p className="text-sm text-stone-500 mt-1">
+                          Seats up to {table.capacity} guests
                         </p>
                       </div>
-                      <span className="px-3 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200">
+                      <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full border border-emerald-200 font-medium">
                         Available
                       </span>
                     </div>
-                    <button className="w-full py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors text-sm">
+                    <button className="w-full btn-primary text-center text-sm py-2.5">
                       Select This Table
                     </button>
                   </div>
                 ))
               ) : (
                 <div className="col-span-2">
-                  <div className="border border-gray-200 rounded-lg p-8">
+                  <div className="glass-card rounded-2xl p-8">
                     <div className="mb-6">
-                      <h2 className="text-2xl font-medium text-gray-900 mb-2">
+                      <h2 className="font-serif text-2xl font-semibold text-stone-800 mb-2">
                         Complete Your Reservation
                       </h2>
-                      <p className="text-sm text-gray-600">
-                        Table {selectedTable.tableNumber} - Capacity: {selectedTable.capacity} guests
+                      <p className="text-sm text-stone-500">
+                        Table {selectedTable.tableNumber} &middot; Seats {selectedTable.capacity} guests
                       </p>
                     </div>
 
                     <form onSubmit={handleBooking} className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-stone-600 mb-1.5">
                           Full Name
                         </label>
                         <input
@@ -208,12 +220,13 @@ const Booking = () => {
                           value={contactInfo.customerName}
                           onChange={handleContactChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                          className="input-restaurant"
+                          placeholder="Your name"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-stone-600 mb-1.5">
                           Email
                         </label>
                         <input
@@ -222,12 +235,13 @@ const Booking = () => {
                           value={contactInfo.email}
                           onChange={handleContactChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                          className="input-restaurant"
+                          placeholder="you@example.com"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-stone-600 mb-1.5">
                           Phone Number
                         </label>
                         <input
@@ -236,7 +250,8 @@ const Booking = () => {
                           value={contactInfo.phone}
                           onChange={handleContactChange}
                           required
-                          className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                          className="input-restaurant"
+                          placeholder="+91 12345 67890"
                         />
                       </div>
 
@@ -244,13 +259,13 @@ const Booking = () => {
                         <button
                           type="button"
                           onClick={() => setShowContactForm(false)}
-                          className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                          className="flex-1 btn-secondary text-center"
                         >
                           Back
                         </button>
                         <button
                           type="submit"
-                          className="flex-1 py-3 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
+                          className="flex-1 btn-primary text-center"
                         >
                           Confirm Reservation
                         </button>

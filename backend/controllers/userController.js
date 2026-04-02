@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Reservation = require('../models/Reservation');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -59,15 +60,62 @@ exports.updateUserRole = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findById(req.params.id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const deletedReservations = await Reservation.deleteMany({ email: user.email });
+
+    await User.findByIdAndDelete(req.params.id);
+
     res.status(200).json({
       success: true,
-      message: 'User deleted successfully'
+      message: `User deleted successfully along with ${deletedReservations.deletedCount} associated reservation(s)`
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.cleanupDatabase = async (req, res) => {
+  try {
+    const adminUser = await User.findOne({ role: 'admin' });
+    const keepCustomer = await User.findOne({ 
+      name: { $regex: /chada jayasen/i } 
+    });
+
+    const keepUserIds = [];
+    const keepEmails = [];
+
+    if (adminUser) {
+      keepUserIds.push(adminUser._id);
+      keepEmails.push(adminUser.email);
+    }
+    if (keepCustomer) {
+      keepUserIds.push(keepCustomer._id);
+      keepEmails.push(keepCustomer.email);
+    }
+
+    const deletedUsers = await User.deleteMany({
+      _id: { $nin: keepUserIds }
+    });
+
+    const deletedReservations = await Reservation.deleteMany({
+      email: { $nin: keepEmails }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Database cleanup completed',
+      details: {
+        usersDeleted: deletedUsers.deletedCount,
+        reservationsDeleted: deletedReservations.deletedCount,
+        keptUsers: keepUserIds.length,
+        keptAdmin: adminUser ? adminUser.name : 'Not found',
+        keptCustomer: keepCustomer ? keepCustomer.name : 'Not found'
+      }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

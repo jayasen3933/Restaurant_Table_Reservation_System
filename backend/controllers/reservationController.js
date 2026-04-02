@@ -11,11 +11,8 @@ exports.checkAvailability = async (req, res) => {
       });
     }
 
-    const requestedDate = new Date(date);
-    requestedDate.setHours(0, 0, 0, 0);
-
-    const nextDay = new Date(requestedDate);
-    nextDay.setDate(nextDay.getDate() + 1);
+    const requestedDate = new Date(date + 'T00:00:00.000Z');
+    const nextDay = new Date(requestedDate.getTime() + 24 * 60 * 60 * 1000);
 
     const existingReservations = await Reservation.find({
       date: {
@@ -74,11 +71,8 @@ exports.createReservation = async (req, res) => {
       });
     }
 
-    const requestedDate = new Date(date);
-    requestedDate.setHours(0, 0, 0, 0);
-
-    const nextDay = new Date(requestedDate);
-    nextDay.setDate(nextDay.getDate() + 1);
+    const requestedDate = new Date(date + 'T00:00:00.000Z');
+    const nextDay = new Date(requestedDate.getTime() + 24 * 60 * 60 * 1000);
 
     const existingReservationsForTimeSlot = await Reservation.find({
       date: {
@@ -115,8 +109,8 @@ exports.createReservation = async (req, res) => {
       customerName,
       email,
       phone,
-      date: requestedDate,
-      time,
+      date: new Date(date + 'T00:00:00.000Z'),
+      time: time.trim(),
       partySize,
       tableId
     });
@@ -138,10 +132,8 @@ exports.getAllReservations = async (req, res) => {
     let query = {};
 
     if (date) {
-      const requestedDate = new Date(date);
-      requestedDate.setHours(0, 0, 0, 0);
-      const nextDay = new Date(requestedDate);
-      nextDay.setDate(nextDay.getDate() + 1);
+      const requestedDate = new Date(date + 'T00:00:00.000Z');
+      const nextDay = new Date(requestedDate.getTime() + 24 * 60 * 60 * 1000);
       
       query.date = {
         $gte: requestedDate,

@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { reservationService } from '../api/reservationService';
-import { Calendar, Clock, Users, Mail, Phone, RefreshCw } from 'lucide-react';
+import api from '../api/axios';
+import { Calendar, Clock, Users, Mail, Phone, RefreshCw, Trash2 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+  const [filterDate, setFilterDate] = useState('');
+  const [showAll, setShowAll] = useState(true);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -17,12 +19,16 @@ const AdminDashboard = () => {
       return;
     }
     fetchReservations();
-  }, [filterDate]);
+  }, [filterDate, showAll]);
 
   const fetchReservations = async () => {
     try {
       setLoading(true);
-      const response = await reservationService.getAllReservations({ date: filterDate });
+      const filters = {};
+      if (!showAll && filterDate) {
+        filters.date = filterDate;
+      }
+      const response = await reservationService.getAllReservations(filters);
       setReservations(response.data);
     } catch (error) {
       console.error('Error fetching reservations:', error);
@@ -40,6 +46,40 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteReservation = async (reservationId) => {
+    if (window.confirm('Are you sure you want to delete this reservation?')) {
+      try {
+        await reservationService.deleteReservation(reservationId);
+        fetchReservations();
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to delete reservation');
+      }
+    }
+  };
+
+  const handleCleanupDatabase = async () => {
+    if (window.confirm('This will delete all users except Admin and Chada Jayasen, along with their reservations. Continue?')) {
+      try {
+        const response = await api.post('/users/cleanup');
+        alert(`Cleanup complete!\nUsers deleted: ${response.data.details.usersDeleted}\nReservations deleted: ${response.data.details.reservationsDeleted}\nKept: ${response.data.details.keptAdmin}, ${response.data.details.keptCustomer}`);
+        fetchReservations();
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to cleanup database');
+      }
+    }
+  };
+
+  const formatDate = (dateStr) => {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-IN', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC'
+    });
+  };
+
   const getStatusColor = (status) => {
     const colors = {
       pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
@@ -52,30 +92,64 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-medium text-gray-900 mb-2">
-            Reservations Dashboard
-          </h1>
-          <p className="text-gray-600">
-            Manage and track all restaurant reservations
-          </p>
-        </div>
-
-        <div className="mb-6 flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Calendar size={20} className="text-gray-600" />
-            <input
-              type="date"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
-            />
+    <div className="min-h-screen bg-stone-50">
+      <div className="bg-stone-900 py-8">
+        <div className="container mx-auto px-6 flex justify-between items-start">
+          <div>
+            <h1 className="font-serif text-4xl font-semibold text-white mb-2">
+              Reservations Dashboard
+            </h1>
+            <p className="text-stone-400">
+              Manage and track all restaurant reservations
+            </p>
           </div>
           <button
+            onClick={handleCleanupDatabase}
+            className="px-4 py-2 bg-red-700/80 text-white text-sm rounded-lg hover:bg-red-600 transition-colors"
+          >
+            Cleanup Database
+          </button>
+        </div>
+      </div>
+      <div className="container mx-auto px-6 py-8">
+
+        <div className="mb-6 flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setShowAll(true); setFilterDate(''); }}
+              className={`px-4 py-2 text-sm rounded-lg transition-all ${
+                showAll 
+                  ? 'bg-amber-800 text-white shadow-md' 
+                  : 'border border-stone-300 text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              All Reservations
+            </button>
+            <button
+              onClick={() => { setShowAll(false); setFilterDate(new Date().toISOString().split('T')[0]); }}
+              className={`px-4 py-2 text-sm rounded-lg transition-all ${
+                !showAll 
+                  ? 'bg-amber-800 text-white shadow-md' 
+                  : 'border border-stone-300 text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              Filter by Date
+            </button>
+          </div>
+          {!showAll && (
+            <div className="flex items-center gap-2">
+              <Calendar size={20} className="text-amber-700" />
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="input-restaurant !py-2"
+              />
+            </div>
+          )}
+          <button
             onClick={fetchReservations}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 border border-stone-300 text-stone-600 rounded-lg hover:bg-stone-100 transition-all"
           >
             <RefreshCw size={16} />
             Refresh
@@ -84,54 +158,50 @@ const AdminDashboard = () => {
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-600">Loading reservations...</p>
+            <p className="text-stone-500">Loading reservations...</p>
           </div>
         ) : reservations.length === 0 ? (
-          <div className="text-center py-12 border border-gray-200 rounded-lg">
-            <p className="text-gray-600">No reservations found for this date.</p>
+          <div className="text-center py-12 glass-card rounded-2xl">
+            <p className="text-stone-500">No reservations found.</p>
           </div>
         ) : (
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <div className="glass-card rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-stone-100 border-b border-stone-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Time
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Contact
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Table
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Party Size
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      Status
-                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Time</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Customer</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Contact</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Table</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Guests</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-stone-100">
                   {reservations.map((reservation) => (
-                    <tr key={reservation._id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={reservation._id} className="hover:bg-amber-50/40 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2 text-sm text-gray-900">
-                          <Clock size={14} className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-sm font-medium text-stone-800">
+                          <Calendar size={14} className="text-amber-600" />
+                          {formatDate(reservation.date)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2 text-sm text-stone-700">
+                          <Clock size={14} className="text-amber-600" />
                           {reservation.time}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-semibold text-stone-800">
                           {reservation.customerName}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600 space-y-1">
+                        <div className="text-sm text-stone-500 space-y-1">
                           <div className="flex items-center gap-2">
                             <Mail size={12} />
                             {reservation.email}
@@ -143,13 +213,13 @@ const AdminDashboard = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-stone-700">
                           Table {reservation.tableId?.tableNumber || 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2 text-sm text-gray-900">
-                          <Users size={14} className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-sm text-stone-700">
+                          <Users size={14} className="text-stone-400" />
                           {reservation.partySize}
                         </div>
                       </td>
@@ -157,7 +227,7 @@ const AdminDashboard = () => {
                         <select
                           value={reservation.status}
                           onChange={(e) => handleStatusChange(reservation._id, e.target.value)}
-                          className={`px-3 py-1 text-xs rounded-full border cursor-pointer focus:outline-none focus:ring-1 focus:ring-gray-400 ${getStatusColor(reservation.status)}`}
+                          className={`px-3 py-1 text-xs rounded-full border cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400/40 ${getStatusColor(reservation.status)}`}
                         >
                           <option value="pending">Pending</option>
                           <option value="confirmed">Confirmed</option>
@@ -165,6 +235,14 @@ const AdminDashboard = () => {
                           <option value="completed">Completed</option>
                           <option value="cancelled">Cancelled</option>
                         </select>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => handleDeleteReservation(reservation._id)}
+                          className="text-stone-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -174,35 +252,41 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-            <div>
-              <p className="text-gray-600">Total</p>
-              <p className="text-lg font-medium text-gray-900">{reservations.length}</p>
+        <div className="mt-6 p-5 glass-card rounded-2xl">
+          <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wider">Summary</h3>
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
+            <div className="p-3 bg-stone-50 rounded-xl">
+              <p className="text-stone-500 text-xs">Total</p>
+              <p className="text-xl font-bold text-stone-800">{reservations.length}</p>
             </div>
-            <div>
-              <p className="text-gray-600">Pending</p>
-              <p className="text-lg font-medium text-yellow-700">
+            <div className="p-3 bg-yellow-50 rounded-xl">
+              <p className="text-yellow-600 text-xs">Pending</p>
+              <p className="text-xl font-bold text-yellow-700">
                 {reservations.filter(r => r.status === 'pending').length}
               </p>
             </div>
-            <div>
-              <p className="text-gray-600">Confirmed</p>
-              <p className="text-lg font-medium text-blue-700">
+            <div className="p-3 bg-blue-50 rounded-xl">
+              <p className="text-blue-600 text-xs">Confirmed</p>
+              <p className="text-xl font-bold text-blue-700">
                 {reservations.filter(r => r.status === 'confirmed').length}
               </p>
             </div>
-            <div>
-              <p className="text-gray-600">Seated</p>
-              <p className="text-lg font-medium text-purple-700">
+            <div className="p-3 bg-purple-50 rounded-xl">
+              <p className="text-purple-600 text-xs">Seated</p>
+              <p className="text-xl font-bold text-purple-700">
                 {reservations.filter(r => r.status === 'seated').length}
               </p>
             </div>
-            <div>
-              <p className="text-gray-600">Completed</p>
-              <p className="text-lg font-medium text-green-700">
+            <div className="p-3 bg-green-50 rounded-xl">
+              <p className="text-green-600 text-xs">Completed</p>
+              <p className="text-xl font-bold text-green-700">
                 {reservations.filter(r => r.status === 'completed').length}
+              </p>
+            </div>
+            <div className="p-3 bg-red-50 rounded-xl">
+              <p className="text-red-600 text-xs">Cancelled</p>
+              <p className="text-xl font-bold text-red-700">
+                {reservations.filter(r => r.status === 'cancelled').length}
               </p>
             </div>
           </div>

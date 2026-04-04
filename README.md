@@ -23,6 +23,7 @@ All pages are protected behind authentication — users **must** log in before a
 - Separate registration and login flow — new users are redirected to Login after sign-up and must manually authenticate before accessing the app
 - Role-based access control (Customer / Admin)
 - Persistent error messages on login failure (visible until the user types again or retries)
+- **Forgot Password** flow — token-based password reset with email lookup, time-limited reset tokens (15 min), and redirect back to Login with a success notification
 
 ### Customer Features
 - Search available tables by date, time, and party size
@@ -80,7 +81,7 @@ Restaurant_Table_Reservation_System/
 │   ├── config/
 │   │   └── db.js                  # MongoDB connection
 │   ├── controllers/
-│   │   ├── authController.js      # Register, login, get current user
+│   │   ├── authController.js      # Register, login, forgot/reset password
 │   │   ├── reservationController.js
 │   │   ├── tableController.js
 │   │   └── userController.js      # User CRUD, stats, DB cleanup
@@ -103,7 +104,7 @@ Restaurant_Table_Reservation_System/
 │   ├── src/
 │   │   ├── api/
 │   │   │   ├── axios.js           # Axios instance with interceptors
-│   │   │   ├── authService.js     # Login, register, logout helpers
+│   │   │   ├── authService.js     # Login, register, logout, forgot/reset password
 │   │   │   ├── reservationService.js
 │   │   │   ├── tableService.js
 │   │   │   └── userService.js
@@ -117,6 +118,8 @@ Restaurant_Table_Reservation_System/
 │   │   │   ├── Booking.jsx        # Table selection & booking confirmation
 │   │   │   ├── Login.jsx          # User login
 │   │   │   ├── Register.jsx       # User registration
+│   │   │   ├── ForgotPassword.jsx # Email submission for password reset
+│   │   │   ├── ResetPassword.jsx  # New password form (token-based)
 │   │   │   ├── AdminDashboard.jsx # Reservation management
 │   │   │   ├── AdminSettings.jsx  # Table & user management
 │   │   │   └── AdminAnalytics.jsx # Stats & insights
@@ -196,6 +199,13 @@ The app will be available at `http://localhost:5173`.
 2. Click **Sign In** to access the application.
 3. If credentials are invalid, the error message remains visible until you start typing or submit again.
 
+### Resetting Your Password
+1. On the Login page, click **Forgot Password?** below the password field.
+2. Enter your registered email address and click **Send Reset Instructions**.
+3. On the success screen, click **Reset Password Now**.
+4. Enter and confirm your new password, then click **Reset Password**.
+5. You will be redirected to the Login page with a green success notification.
+
 ### Booking a Table
 1. On the **Home** page, select a date, time, and party size, then click **Find Available Tables**.
 2. Browse the available tables and select one.
@@ -217,6 +227,8 @@ The app will be available at `http://localhost:5173`.
 | `POST` | `/api/auth/register` | Register a new user | Public |
 | `POST` | `/api/auth/login` | Log in and receive JWT | Public |
 | `GET` | `/api/auth/me` | Get current user profile | Protected |
+| `POST` | `/api/auth/forgot-password` | Request a password reset token | Public |
+| `POST` | `/api/auth/reset-password` | Reset password with token | Public |
 
 ### Tables
 | Method | Endpoint | Description | Auth |

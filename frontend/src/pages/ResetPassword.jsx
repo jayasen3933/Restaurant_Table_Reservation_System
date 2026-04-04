@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { UtensilsCrossed } from 'lucide-react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { authService } from '../api/authService';
+import { UtensilsCrossed, ArrowLeft } from 'lucide-react';
 
-const Login = () => {
+const ResetPassword = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { login } = useAuth();
-  const [successMsg] = useState(location.state?.message || '');
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
+
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,17 +26,29 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    if (!token) {
+      setError('Invalid reset link. Please request a new one.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const data = await login(formData);
-      if (data.user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/');
-      }
+      await authService.resetPassword(token, formData.password);
+      navigate('/login', { state: { message: 'Password reset successful. Please sign in with your new password.' } });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login');
+      setError(err.response?.data?.message || 'Failed to reset password. The link may have expired.');
     } finally {
       setLoading(false);
     }
@@ -62,17 +74,11 @@ const Login = () => {
 
         <div className="glass-card rounded-2xl p-8">
           <h2 className="font-serif text-2xl font-medium text-stone-800 mb-1 text-center">
-            Welcome Back
+            Set New Password
           </h2>
           <p className="text-stone-500 text-sm text-center mb-6">
-            Sign in to manage your reservations
+            Enter your new password below
           </p>
-
-          {successMsg && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-700">{successMsg}</p>
-            </div>
-          )}
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -83,22 +89,7 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-stone-600 mb-1.5">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="input-restaurant"
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-stone-600 mb-1.5">
-                Password
+                New Password
               </label>
               <input
                 type="password"
@@ -111,10 +102,19 @@ const Login = () => {
               />
             </div>
 
-            <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-sm text-amber-700 hover:text-amber-800 font-semibold hover:underline">
-                Forgot Password?
-              </Link>
+            <div>
+              <label className="block text-sm font-medium text-stone-600 mb-1.5">
+                Confirm New Password
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                className="input-restaurant"
+                placeholder="••••••••"
+              />
             </div>
 
             <button
@@ -122,17 +122,15 @@ const Login = () => {
               disabled={loading}
               className="w-full btn-primary disabled:opacity-50 text-center"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Resetting...' : 'Reset Password'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-stone-500">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-amber-700 hover:text-amber-800 font-semibold hover:underline">
-                Sign up
-              </Link>
-            </p>
+            <Link to="/login" className="inline-flex items-center gap-1.5 text-sm text-amber-700 hover:text-amber-800 font-semibold hover:underline">
+              <ArrowLeft size={14} />
+              Back to Sign In
+            </Link>
           </div>
         </div>
       </div>
@@ -140,4 +138,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;

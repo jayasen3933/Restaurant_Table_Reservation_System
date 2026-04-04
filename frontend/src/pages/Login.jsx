@@ -14,6 +14,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
+    if (error) setError('');
     setFormData({
       ...formData,
       [e.target.name]: e.target.value

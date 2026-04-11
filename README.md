@@ -1,223 +1,179 @@
-# 🍽️ La Maison - Restaurant Table Reservation System
+# La Maison - Restaurant Table Reservation System
 
-A full-stack **MERN** (MongoDB, Express.js, React, Node.js) restaurant table reservation system with real-time availability checking, automated booking management, user-specific reservation tracking, and comprehensive admin controls.
-
----
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation & Setup](#installation--setup)
-- [Running the Application](#running-the-application)
-- [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [Usage Guide](#usage-guide)
-- [License](#license)
+A full-stack **MERN** application for reserving restaurant tables online, checking real-time availability, and managing reservations through a comprehensive admin dashboard. Styled with a warm, premium restaurant theme featuring amber and stone tones, serif typography, and frosted-glass UI elements.
 
 ---
 
-## 🎯 Overview
+## Project Overview
 
-**La Maison** is a modern, full-featured restaurant table reservation platform designed for both customers and restaurant administrators. The system provides:
+La Maison is an end-to-end table reservation platform designed for both customers and restaurant administrators:
 
-- **For Customers**: 
-  - Seamless table booking with real-time availability
-  - Personal reservation dashboard showing booking history
-  - Automatic redirection to "My Reservations" after booking
-  - Clear display of table number, date, and time for each reservation
+- **Customers** create an account, log in, search for available tables by date/time/party size, confirm bookings with contact details, and view their personal reservation history in a dedicated dashboard.
+- **Admins** manage reservations (approve, seat, complete, or cancel), add or remove tables, manage users and roles, and review analytics from a dedicated dashboard.
 
-- **For Admins**: 
-  - Comprehensive reservation management
-  - Table and user management
-  - Analytics and insights dashboard
-  - Database cleanup utilities
-
-All pages are protected with JWT-based authentication and role-based access control (Customer/Admin).
+All pages are protected behind authentication — users **must** log in before accessing any part of the application.
 
 ---
 
-## ✨ Features
+## Features
 
-### 🔐 Authentication & Security
-- **JWT-based authentication** with secure password hashing (bcrypt)
-- **Protected routes** - Unauthenticated users redirected to login
-- **Role-based access control** (Customer / Admin)
-- **Forgot Password flow** - Token-based password reset with 15-minute expiry
-- **Persistent sessions** with automatic token refresh
+### Authentication & Security
+- JWT-based authentication with secure password hashing (bcrypt)
+- **Protected routes** — unauthenticated visitors are redirected to the Login page
+- Separate registration and login flow — new users are redirected to Login after sign-up and must manually authenticate before accessing the app
+- Role-based access control (Customer / Admin)
+- Persistent error messages on login failure (visible until the user types again or retries)
+- **Forgot Password** flow — token-based password reset with email lookup, time-limited reset tokens (15 min), and redirect back to Login with a success notification
 
-### 👤 Customer Features
-- **Automated Table Availability** - Dynamic availability based on existing reservations
-- **Real-time Availability Check** - See available (green) and reserved (red) tables
-- **Seamless Booking Flow** - Select table, fill contact details, confirm reservation
-- **Automatic Redirection** - After successful booking, automatically redirected to "My Reservations" page
-- **Personal Dashboard** with user-specific booking history:
-  - **Current/Upcoming Bookings** - Active and future reservations
-  - **Past Bookings** - Completed, cancelled, and historical reservations
+### Customer Features
+- Search available tables by date, time, and party size
+- Real-time table availability checking with visual indicators (green = available, red = reserved)
+- Select a table and confirm the reservation with contact details
+- **Automatic redirection to "My Reservations"** dashboard after successful booking (2-second delay)
+- **Personal Dashboard** showing user-specific reservation history:
+  - **Current/Upcoming Bookings** — Active and future reservations
+  - **Past Bookings** — Completed, cancelled, and historical reservations
   - Displays: Table Number, Date, Time, Number of Guests, Status
-- **User-Specific Data** - Backend fetches reservations using authenticated user's ID
-- **Quick Reservation Access** - "Make a Reservation" button in dashboard header
+- **User-specific data** — Backend queries filter by authenticated user's ID (customers only see their own reservations)
+- Quick access to make new reservations from dashboard header
+- Full page scrolling enabled on all pages
 
-### 🔧 Admin Features
-- **Reservation Dashboard** - Summary cards and detailed reservation table
-- **Optimized Column Order** - Date, Time, Customer Contact, Table, Guests, Status
-- **Reservation Management** - Update status (Pending, Confirmed, Seated, Completed, Cancelled)
-- **Table Management** - Add/remove tables (availability automated based on bookings)
-- **User Management** - Promote/demote roles, manage user accounts
-- **Analytics Dashboard** - Statistics, occupancy rates, performance metrics
-- **Full Page Scrolling** - All admin pages fully scrollable to view all data
-- **Database Cleanup** - Utility to manage old reservations
+### Admin Features
+- **Dashboard** — View, filter (by date), and manage all reservations with status updates (Pending, Confirmed, Seated, Completed, Cancelled)
+- **Optimized column order** — Date, Time, Customer Contact, Table, Guests, Status for better workflow
+- **Settings** — Add/remove tables, manage users, and promote or demote user roles
+- **Analytics** — Overview cards (total reservations, today's bookings, total users, total tables), reservation status breakdown, and quick insight metrics (occupancy, completion, and cancellation rates)
+- **Full page scrolling** — All admin pages fully scrollable to view complete data sets
+- Database cleanup utility
 
-### 🎨 UI/UX Features
-- **Full Page Scrolling** - All pages use `min-h-screen` with natural scrolling
-- **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
-- **Premium Restaurant Theme** - Warm amber, stone, and earth tones
-- **Frosted Glass Effects** - Modern card components with backdrop blur
-- **Google Fonts** - Playfair Display (serif) for headings, Inter (sans-serif) for body
-- **Lucide React Icons** - Consistent iconography throughout
+### Automated Booking Protection
+- **Strict concurrency control** — Prevents double-booking at database level
+- **Real-time validation** — Checks for existing reservations before confirming
+- **User-friendly error messages** — "Book at another time, already another customer booked"
+- **Maximum capacity limits** — 4 reservations per time slot
 
-### 🚫 Automated Booking Protection
-- **Strict Concurrency Control** - Prevents double-booking at database level
-- **Real-time Validation** - Checks for existing reservations before confirming
-- **User-friendly Error Messages** - "Book at another time, already another customer booked"
-- **Maximum Capacity Limits** - 4 reservations per time slot
+### UI / UX
+- Warm restaurant theme with amber, stone, and earth tones
+- Playfair Display (serif) headings and Inter (sans-serif) body text via Google Fonts
+- Frosted-glass card components with subtle backdrop blur
+- **Full page scrolling** — All pages use `min-h-screen` with natural scrolling (no content cut off)
+- Responsive layout across desktop and mobile
+- Lucide React icons throughout the interface
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| **React** | 19.x | UI framework with hooks and context |
-| **Vite** | 8.x | Build tool and dev server |
-| **React Router** | 7.x | Client-side routing and navigation |
-| **Tailwind CSS** | 3.x | Utility-first styling with custom theme |
-| **Axios** | Latest | HTTP client with interceptors |
-| **Lucide React** | Latest | Icon library |
-| **Google Fonts** | - | Playfair Display & Inter typography |
+| Technology | Purpose |
+|---|---|
+| **React 19** | UI framework |
+| **Vite 8** | Build tool and dev server |
+| **React Router 7** | Client-side routing and protected routes |
+| **Tailwind CSS 3** | Utility-first styling with custom theme |
+| **Axios** | HTTP client with request/response interceptors |
+| **Lucide React** | Icon library |
+| **Google Fonts** | Playfair Display & Inter typography |
 
 ### Backend
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| **Node.js** | 18+ | JavaScript runtime environment |
-| **Express.js** | 5.x | Web application framework |
-| **MongoDB** | 6+ | NoSQL database |
-| **Mongoose** | 9.x | MongoDB ODM with schema validation |
-| **JSON Web Tokens** | Latest | Stateless authentication |
-| **bcryptjs** | Latest | Password hashing |
-| **dotenv** | Latest | Environment variable management |
-| **nodemon** | Latest | Development auto-restart |
-| **crypto** | Built-in | Password reset token generation |
+| Technology | Purpose |
+|---|---|
+| **Node.js** | JavaScript runtime |
+| **Express 5** | Web server framework |
+| **MongoDB** | NoSQL database |
+| **Mongoose 9** | ODM for MongoDB |
+| **JSON Web Tokens** | Stateless authentication |
+| **bcryptjs** | Password hashing |
+| **dotenv** | Environment variable management |
+| **nodemon** | Development auto-restart |
 
 ---
 
-## 📁 Project Structure
+## Folder Structure
 
 ```
 Restaurant_Table_Reservation_System/
-│
-├── backend/                          # Node.js/Express backend
+├── backend/
 │   ├── config/
-│   │   └── db.js                     # MongoDB connection configuration
-│   │
+│   │   └── db.js                  # MongoDB connection
 │   ├── controllers/
-│   │   ├── authController.js         # Authentication (register, login, forgot/reset password)
-│   │   ├── reservationController.js  # Reservation CRUD, availability, double-booking prevention
-│   │   ├── tableController.js        # Table management (add, delete)
-│   │   └── userController.js         # User management, statistics, database cleanup
-│   │
+│   │   ├── authController.js      # Register, login, forgot/reset password
+│   │   ├── reservationController.js # Reservation CRUD, availability, userId filtering
+│   │   ├── tableController.js     # Table management
+│   │   └── userController.js      # User CRUD, stats, DB cleanup
 │   ├── middleware/
-│   │   └── auth.js                   # JWT verification, role authorization
-│   │
+│   │   └── auth.js                # JWT verify, role authorization
 │   ├── models/
-│   │   ├── User.js                   # User schema (name, email, password, role, reset tokens)
-│   │   ├── Table.js                  # Table schema (tableNumber, capacity)
-│   │   └── Reservation.js            # Reservation schema (customer details, date, time, tableId, userId, status)
-│   │
+│   │   ├── User.js                # User schema with role and reset tokens
+│   │   ├── Table.js               # Table schema (tableNumber, capacity)
+│   │   └── Reservation.js         # Reservation schema with userId field
 │   ├── routes/
-│   │   ├── authRoutes.js             # Authentication endpoints
-│   │   ├── reservationRoutes.js      # Reservation endpoints
-│   │   ├── tableRoutes.js            # Table management endpoints
-│   │   └── userRoutes.js             # User management endpoints
-│   │
-│   ├── .env                          # Environment variables (PORT, MONGO_URI, JWT_SECRET)
-│   ├── server.js                     # Express app entry point
-│   └── package.json                  # Backend dependencies
+│   │   ├── authRoutes.js
+│   │   ├── reservationRoutes.js   # Updated: allows customers to fetch their own reservations
+│   │   ├── tableRoutes.js
+│   │   └── userRoutes.js
+│   ├── .env                       # Environment variables
+│   ├── server.js                  # Express app entry point
+│   └── package.json
 │
-├── frontend/                         # React/Vite frontend
+├── frontend/
 │   ├── src/
 │   │   ├── api/
-│   │   │   ├── axios.js              # Axios instance with base URL and interceptors
-│   │   │   ├── authService.js        # Authentication API calls
-│   │   │   ├── reservationService.js # Reservation API calls (includes userId filtering)
-│   │   │   ├── tableService.js       # Table management API calls
-│   │   │   └── userService.js        # User management API calls
-│   │   │
+│   │   │   ├── axios.js           # Axios instance with interceptors
+│   │   │   ├── authService.js     # Login, register, logout, forgot/reset password
+│   │   │   ├── reservationService.js # Includes userId filtering support
+│   │   │   ├── tableService.js
+│   │   │   └── userService.js
 │   │   ├── components/
-│   │   │   ├── Navbar.jsx            # Global navigation with role-based links
-│   │   │   └── ProtectedRoute.jsx    # Route guard component
-│   │   │
+│   │   │   ├── Navbar.jsx         # Global navigation bar with "Sign Up" button
+│   │   │   └── ProtectedRoute.jsx # Auth guard for routes
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx       # Global auth state management
-│   │   │
+│   │   │   └── AuthContext.jsx    # Auth state provider
 │   │   ├── pages/
-│   │   │   ├── Home.jsx              # Landing page with reservation search
-│   │   │   ├── Booking.jsx           # Table selection, booking confirmation, auto-redirect
-│   │   │   ├── Login.jsx             # User login with sign-up link
-│   │   │   ├── Register.jsx          # User registration
-│   │   │   ├── ForgotPassword.jsx    # Password reset request
-│   │   │   ├── ResetPassword.jsx     # New password form (token-based)
-│   │   │   ├── CustomerDashboard.jsx # Customer reservation history (userId-based)
-│   │   │   ├── AdminDashboard.jsx    # Admin reservation management
-│   │   │   ├── AdminSettings.jsx     # Table & user management with full scrolling
-│   │   │   └── AdminAnalytics.jsx    # Statistics and insights
-│   │   │
-│   │   ├── App.jsx                   # Route definitions and layout (min-h-screen)
-│   │   ├── main.jsx                  # React DOM entry point
-│   │   └── index.css                 # Tailwind directives and custom styles
-│   │
-│   ├── index.html                    # HTML shell with Google Fonts
-│   ├── tailwind.config.js            # Custom theme configuration
-│   ├── vite.config.js                # Vite build configuration
-│   └── package.json                  # Frontend dependencies
+│   │   │   ├── Home.jsx           # Hero + reservation search form (min-h-screen)
+│   │   │   ├── Booking.jsx        # Table selection, booking, auto-redirect to dashboard
+│   │   │   ├── Login.jsx          # User login with sign-up link
+│   │   │   ├── Register.jsx       # User registration
+│   │   │   ├── ForgotPassword.jsx # Email submission for password reset
+│   │   │   ├── ResetPassword.jsx  # New password form (token-based)
+│   │   │   ├── CustomerDashboard.jsx # User-specific reservation history
+│   │   │   ├── AdminDashboard.jsx # Reservation management (full scrolling)
+│   │   │   ├── AdminSettings.jsx  # Table & user management (full scrolling)
+│   │   │   └── AdminAnalytics.jsx # Stats & insights
+│   │   ├── App.jsx                # Route definitions (min-h-screen layout)
+│   │   ├── main.jsx               # React DOM entry point
+│   │   └── index.css              # Tailwind directives & custom utilities
+│   ├── index.html                 # HTML shell with Google Fonts
+│   ├── tailwind.config.js         # Custom theme (colors, fonts)
+│   └── package.json
 │
-└── README.md                         # This file
+└── README.md
 ```
 
 ---
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - **Node.js** v18 or higher
 - **MongoDB** (local instance or MongoDB Atlas)
-- **npm** or **yarn**
+- **npm**
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/Restaurant_Table_Reservation_System.git
+git clone https://github.com/<your-username>/Restaurant_Table_Reservation_System.git
 cd Restaurant_Table_Reservation_System
 ```
 
 ### 2. Backend Setup
 
-Navigate to the backend directory:
-
 ```bash
 cd backend
-```
-
-Install dependencies:
-
-```bash
 npm install
 ```
 
-Create a `.env` file in the `backend/` directory with the following variables:
+Create a `.env` file in the `backend/` directory:
 
 ```env
 PORT=5000
@@ -225,261 +181,125 @@ MONGO_URI=mongodb://localhost:27017/restaurant_reservation
 JWT_SECRET=your_jwt_secret_key_change_this_in_production
 ```
 
-**Note:** Replace `MONGO_URI` with your MongoDB connection string (local or Atlas). Change `JWT_SECRET` to a secure random string in production.
+Start the server:
+
+```bash
+npm run dev
+```
+
+The API will be available at `http://localhost:5000`.
 
 ### 3. Frontend Setup
 
-Open a **new terminal** and navigate to the frontend directory:
+Open a **new terminal**:
 
 ```bash
 cd frontend
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
----
-
-## 🏃 Running the Application
-
-### Start the Backend Server
-
-From the `backend/` directory:
-
-```bash
 npm run dev
 ```
 
-The backend API will be available at `http://localhost:5000`.
-
-**Expected Output:**
-```
-Server running on port 5000
-MongoDB Connected: <your-connection-string>
-```
-
-### Start the Frontend Development Server
-
-From the `frontend/` directory (in a separate terminal):
-
-```bash
-npm run dev
-```
-
-The frontend will be available at `http://localhost:5173`.
-
-**Expected Output:**
-```
-VITE v8.x.x  ready in xxx ms
-
-➜  Local:   http://localhost:5173/
-➜  Network: use --host to expose
-```
-
-### Access the Application
-
-Open your browser and navigate to:
-```
-http://localhost:5173
-```
-
-You will be redirected to the Login page. Create an account or use existing credentials.
+The app will be available at `http://localhost:5173`.
 
 ---
 
-## 🔌 API Endpoints
+## Usage
+
+### Creating an Account
+1. Open `http://localhost:5173` — you will be redirected to the **Login** page.
+2. Click **Sign up** (top-right navbar button) or the **"Don't have an account? Sign up"** link at the bottom of the login form to navigate to the registration page.
+3. Fill in your name, email, and password, then click **Create Account**.
+4. You will be redirected back to the **Login** page.
+
+### Logging In
+1. Enter the email and password you registered with.
+2. Click **Sign In** to access the application.
+3. If credentials are invalid, the error message remains visible until you start typing or submit again.
+
+### Resetting Your Password
+1. On the Login page, click **Forgot Password?** below the password field.
+2. Enter your registered email address and click **Send Reset Instructions**.
+3. On the success screen, click **Reset Password Now**.
+4. Enter and confirm your new password, then click **Reset Password**.
+5. You will be redirected to the Login page with a green success notification.
+
+### Booking a Table
+1. On the **Home** page, select a date, time, and party size, then click **Find Available Tables**.
+2. Browse the available tables (green = available, red = reserved) and select one.
+3. Fill in your contact details (name, email, phone) and click **Confirm Reservation**.
+4. A confirmation screen will display your booking summary.
+5. **After 2 seconds**, you will be **automatically redirected** to your **"My Reservations"** dashboard.
+
+### Viewing Your Reservations
+1. After booking, you'll be automatically redirected to **My Reservations** (Customer Dashboard).
+2. Or click **My Reservations** in the navigation bar anytime.
+3. View two sections:
+   - **Current/Upcoming Bookings** — Active and future reservations
+   - **Past Bookings** — Completed, cancelled, and historical bookings
+4. Each reservation shows:
+   - **Table Number** — Which table you booked
+   - **Date** — Exact date of reservation
+   - **Time** — Exact time of reservation
+   - **Guests** — Number of people
+   - **Status** — Current reservation status (Pending, Confirmed, Seated, Completed, Cancelled)
+5. Click **Make a Reservation** to book a new table.
+6. Click **Refresh** to update your reservation list.
+
+**Important:** The system fetches ONLY your reservations using your authenticated user ID. You will never see reservations made by other customers.
+
+### Admin Access
+1. Register an admin user via the API (see below) or promote an existing user from the Admin Settings panel.
+2. Log in with admin credentials — you will be directed to the **Admin Dashboard**.
+3. From the dashboard, navigate to **Settings** (manage tables and users) or **Analytics** (view performance metrics).
+4. All admin pages support **full scrolling** to view complete data sets.
+
+---
+
+## API Endpoints
 
 ### Authentication
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `POST` | `/api/auth/register` | Register a new user | No |
-| `POST` | `/api/auth/login` | Login and receive JWT | No |
-| `GET` | `/api/auth/me` | Get current user profile | Yes |
-| `POST` | `/api/auth/forgot-password` | Request password reset token | No |
-| `POST` | `/api/auth/reset-password` | Reset password with token | No |
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Register a new user | Public |
+| `POST` | `/api/auth/login` | Log in and receive JWT | Public |
+| `GET` | `/api/auth/me` | Get current user profile | Protected |
+| `POST` | `/api/auth/forgot-password` | Request a password reset token | Public |
+| `POST` | `/api/auth/reset-password` | Reset password with token | Public |
 
 ### Tables
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/api/tables` | Get all tables | No |
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/tables` | Get all tables | Public |
 | `POST` | `/api/tables` | Create a new table | Admin |
 | `DELETE` | `/api/tables/:id` | Delete a table | Admin |
 
 ### Reservations
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/api/reservations/check-availability` | Check table availability for date/time | No |
-| `POST` | `/api/reservations` | Create a new reservation (includes userId) | Yes |
-| `GET` | `/api/reservations` | Get reservations (supports userId, email, date, status filters) | Yes |
-| `GET` | `/api/reservations/:id` | Get reservation by ID | Yes |
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/reservations/check-availability` | Check table availability | Public |
+| `POST` | `/api/reservations` | Create a reservation (includes userId) | Public |
+| `GET` | `/api/reservations` | Get reservations (supports userId, email, date, status filters) | **Protected** |
+| `GET` | `/api/reservations/:id` | Get reservation by ID | Protected |
 | `PUT` | `/api/reservations/:id/status` | Update reservation status | Admin |
 | `DELETE` | `/api/reservations/:id` | Delete a reservation | Admin |
 
-**Important:** The `GET /api/reservations` endpoint accepts a `userId` query parameter to fetch reservations for a specific user.
+**Important:** The `GET /api/reservations` endpoint now allows **authenticated customers** to fetch their own reservations by passing `userId` as a query parameter. Admins can view all reservations.
 
 ### Users (Admin Only)
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
 | `GET` | `/api/users` | Get all users | Admin |
 | `GET` | `/api/users/stats` | Get user statistics | Admin |
 | `GET` | `/api/users/:id` | Get user by ID | Admin |
 | `PUT` | `/api/users/:id` | Update user role | Admin |
 | `DELETE` | `/api/users/:id` | Delete a user | Admin |
-| `POST` | `/api/users/cleanup` | Cleanup old reservations | Admin |
+| `POST` | `/api/users/cleanup` | Cleanup database | Admin |
 
 ---
 
-## 🗄️ Database Schema
+## Creating an Admin User
 
-### User Model
-```javascript
-{
-  name: String (required),
-  email: String (required, unique, lowercase),
-  password: String (required, hashed with bcrypt),
-  role: String (enum: ['customer', 'admin'], default: 'customer'),
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-  timestamps: true
-}
-```
-
-### Table Model
-```javascript
-{
-  tableNumber: Number (required, unique),
-  capacity: Number (required, min: 1),
-  timestamps: true
-}
-```
-
-### Reservation Model
-```javascript
-{
-  customerName: String (required),
-  email: String (required, validated),
-  phone: String (required),
-  date: Date (required),
-  time: String (required),
-  partySize: Number (required, min: 1),
-  tableId: ObjectId (ref: 'Table', required),
-  userId: ObjectId (ref: 'User'),  // Links reservation to user
-  status: String (enum: ['pending', 'confirmed', 'seated', 'completed', 'cancelled'], default: 'pending'),
-  timestamps: true
-}
-```
-
-**Key Feature:** The `userId` field in the Reservation model links each reservation to a specific user, enabling user-specific booking history.
-
----
-
-## 📖 Usage Guide
-
-### Creating an Account
-1. Navigate to `http://localhost:5173` - you'll be redirected to the **Login** page
-2. Click **"Don't have an account? Sign up"** at the bottom
-3. Fill in your name, email, and password
-4. Click **Create Account** - you'll be redirected to Login
-
-### Logging In
-1. Enter your registered email and password
-2. Click **Sign In**
-3. You'll be directed to the Home page (customers) or Admin Dashboard (admins)
-
-### Making a Reservation (Customer)
-1. On the **Home** page, select:
-   - Date (future dates only)
-   - Time (available time slots)
-   - Party size (number of guests)
-2. Click **Find Available Tables**
-3. Browse available tables (green) and reserved tables (red)
-4. Click on an available table
-5. Fill in your contact details (name, email, phone)
-6. Click **Confirm Reservation**
-7. **Automatic Redirection**: After 2 seconds, you'll be redirected to "My Reservations"
-
-### Viewing Your Reservations (Customer)
-1. After booking, you'll be automatically redirected to **My Reservations**
-2. Or click **My Reservations** in the navigation bar anytime
-3. View two sections:
-   - **Current/Upcoming Bookings** - Active and future reservations
-   - **Past Bookings** - Completed, cancelled, and historical bookings
-4. Each reservation shows:
-   - **Table Number** - Which table you booked
-   - **Date** - Exact date of reservation
-   - **Time** - Exact time of reservation
-   - **Guests** - Number of people
-   - **Status** - Current reservation status
-5. Click **Make a Reservation** to book a new table
-6. Click **Refresh** to update your reservation list
-
-**Important:** The system fetches ONLY your reservations using your authenticated user ID. You will never see reservations made by other customers.
-
-### Managing Reservations (Admin)
-1. Log in with admin credentials
-2. Navigate to **Dashboard** from the navbar
-3. View summary cards showing reservation statistics
-4. Scroll through the full reservations table to see all bookings
-5. Update reservation status using the dropdown
-6. Delete reservations using the trash icon
-7. Filter by date using the date picker
-
-### Managing Tables & Users (Admin)
-1. Navigate to **Settings** from the navbar
-2. **Tables Tab**:
-   - Click **Add Table** to create new tables
-   - Scroll through the full table list
-   - Delete tables using the trash icon
-3. **Users Tab**:
-   - Scroll through the full user list
-   - Update user roles (Customer ↔ Admin)
-   - Delete users using the trash icon
-
-### Viewing Analytics (Admin)
-1. Navigate to **Analytics** from the navbar
-2. View overview cards and statistics
-3. Scroll to see all data and charts
-
----
-
-## 🔒 Security Features
-
-1. **Password Security**
-   - Bcrypt hashing with salt rounds
-   - Minimum 6 characters required
-
-2. **JWT Authentication**
-   - Secure token generation
-   - Automatic token expiration
-
-3. **Route Protection**
-   - Frontend route guards
-   - Backend middleware authorization
-   - Role-based access control
-
-4. **Input Validation**
-   - Email format validation
-   - Phone number validation
-   - Date/time validation
-
-5. **Double-Booking Prevention**
-   - Database-level concurrency checks
-   - Atomic reservation creation
-   - Real-time availability validation
-
-6. **User-Specific Data**
-   - Backend queries filter by authenticated userId
-   - Customers only see their own reservations
-   - Admins see all reservations
-
----
-
-## 🧪 Creating an Admin User
-
-Register an admin account via API:
+Register an admin account via the API:
 
 ```bash
 POST http://localhost:5000/api/auth/register
@@ -493,52 +313,10 @@ Content-Type: application/json
 }
 ```
 
-Or promote an existing user from the **Admin Settings > Users** tab.
+Alternatively, log in as an existing admin and promote any user from the **Admin Settings > Users** tab.
 
 ---
 
-## 🎨 Design Philosophy
+## License
 
-### Color Palette
-- **Primary**: Amber (#d97706) - Warm, inviting accent
-- **Background**: Stone (#f5f5f4) - Neutral, elegant base
-- **Text**: Stone-800 (#292524) - High contrast for readability
-
-### Typography
-- **Headings**: Playfair Display (serif) - Elegant, classic
-- **Body**: Inter (sans-serif) - Modern, readable
-
-### Layout
-- **Full Page Scrolling**: All pages use `min-h-screen` for natural scrolling
-- **No Overflow Hidden**: Content is never cut off
-- **Responsive**: Works on all screen sizes
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
----
-
-## 🙏 Acknowledgments
-
-- **MongoDB** - Database platform
-- **Express.js** - Web framework
-- **React** - UI library
-- **Node.js** - Runtime environment
-- **Tailwind CSS** - Styling framework
-- **Lucide React** - Icon library
-- **Google Fonts** - Typography
-
----
-
-## 📧 Contact
-
-For questions or support, please contact:
-- **Email**: support@lamaison-restaurant.com
-- **GitHub**: [Your GitHub Profile](https://github.com/your-username)
-
----
-
-**Built with ❤️ using the MERN Stack**
+MIT

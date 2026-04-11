@@ -9,6 +9,7 @@ const Booking = () => {
   const searchParams = location.state;
 
   const [availableTables, setAvailableTables] = useState([]);
+  const [allTables, setAllTables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTable, setSelectedTable] = useState(null);
   const [showContactForm, setShowContactForm] = useState(false);
@@ -38,6 +39,7 @@ const Booking = () => {
         searchParams.partySize
       );
       setAvailableTables(response.data);
+      setAllTables(response.allTables || []);
       setRemainingSlots(response.remainingSlots || 0);
       setSlotMessage(response.message || '');
     } catch (error) {
@@ -107,7 +109,7 @@ const Booking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="h-screen flex flex-col bg-stone-50">
       <div className="bg-stone-900 py-10">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -132,7 +134,7 @@ const Booking = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-10">
+      <div className="flex-1 overflow-y-auto container mx-auto px-4 py-10">
         <div className="max-w-4xl mx-auto">
           {!loading && remainingSlots > 0 && remainingSlots < 4 && availableTables.length > 0 && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
@@ -173,30 +175,52 @@ const Booking = () => {
           ) : availableTables.length === 0 && slotMessage ? null : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {!showContactForm ? (
-                availableTables.map((table) => (
-                  <div
-                    key={table._id}
-                    className="glass-card rounded-2xl p-6 hover:shadow-xl hover:border-amber-300 transition-all cursor-pointer group"
-                    onClick={() => handleTableSelect(table)}
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="font-serif text-xl font-semibold text-stone-800 group-hover:text-amber-800 transition-colors">
-                          Table {table.tableNumber}
-                        </h3>
-                        <p className="text-sm text-stone-500 mt-1">
-                          Seats up to {table.capacity} guests
-                        </p>
+                allTables.map((table) => {
+                  const isAvailable = availableTables.some(t => t._id === table._id);
+                  return (
+                    <div
+                      key={table._id}
+                      className={`glass-card rounded-2xl p-6 hover:shadow-xl transition-all ${
+                        isAvailable 
+                          ? 'hover:border-amber-300 cursor-pointer group' 
+                          : 'opacity-60 border-stone-300 cursor-not-allowed'
+                      }`}
+                      onClick={() => isAvailable && handleTableSelect(table)}
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className={`font-serif text-xl font-semibold transition-colors ${
+                            isAvailable 
+                              ? 'text-stone-800 group-hover:text-amber-800' 
+                              : 'text-stone-500'
+                          }`}>
+                            Table {table.tableNumber}
+                          </h3>
+                          <p className="text-sm text-stone-500 mt-1">
+                            Seats up to {table.capacity} guests
+                          </p>
+                        </div>
+                        <span className={`px-3 py-1 text-xs rounded-full border font-medium ${
+                          isAvailable 
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                            : 'bg-red-50 text-red-700 border-red-200'
+                        }`}>
+                          {isAvailable ? 'Available' : 'Reserved'}
+                        </span>
                       </div>
-                      <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full border border-emerald-200 font-medium">
-                        Available
-                      </span>
+                      <button 
+                        className={`w-full text-center text-sm py-2.5 rounded-lg transition-all ${
+                          isAvailable 
+                            ? 'btn-primary' 
+                            : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                        }`}
+                        disabled={!isAvailable}
+                      >
+                        {isAvailable ? 'Select This Table' : 'Reserved'}
+                      </button>
                     </div>
-                    <button className="w-full btn-primary text-center text-sm py-2.5">
-                      Select This Table
-                    </button>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="col-span-2">
                   <div className="glass-card rounded-2xl p-8">

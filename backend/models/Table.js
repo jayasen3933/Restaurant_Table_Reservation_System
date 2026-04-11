@@ -11,12 +11,7 @@ const tableSchema = new mongoose.Schema({
     required: [true, 'Please provide table capacity'],
     min: [1, 'Capacity must be at least 1']
   },
-  status: {
-    type: String,
-    enum: ['available', 'occupied'],
-    default: 'available'
-  }
-}, {
+  }, {
   timestamps: true
 });
 

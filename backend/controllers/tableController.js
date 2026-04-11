@@ -24,8 +24,7 @@ exports.createTable = async (req, res) => {
 
     const table = await Table.create({
       tableNumber,
-      capacity,
-      status: 'available'
+      capacity
     });
 
     res.status(201).json({
@@ -37,27 +36,6 @@ exports.createTable = async (req, res) => {
   }
 };
 
-exports.updateTableStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
-    const table = await Table.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true, runValidators: true }
-    );
-
-    if (!table) {
-      return res.status(404).json({ message: 'Table not found' });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: table
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
 exports.deleteTable = async (req, res) => {
   try {

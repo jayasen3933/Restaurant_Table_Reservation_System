@@ -92,7 +92,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="h-screen flex flex-col bg-stone-50">
       <div className="bg-stone-900 py-8">
         <div className="container mx-auto px-6 flex justify-between items-start">
           <div>
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
           </button>
         </div>
       </div>
-      <div className="container mx-auto px-6 py-8">
+      <div className="flex-1 overflow-y-auto container mx-auto px-6 py-8">
 
         <div className="mb-6 flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
@@ -160,137 +160,135 @@ const AdminDashboard = () => {
           <div className="text-center py-12">
             <p className="text-stone-500">Loading reservations...</p>
           </div>
-        ) : reservations.length === 0 ? (
-          <div className="text-center py-12 glass-card rounded-2xl">
-            <p className="text-stone-500">No reservations found.</p>
-          </div>
         ) : (
-          <div className="glass-card rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-stone-100 border-b border-stone-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Time</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Customer</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Contact</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Table</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Guests</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-stone-100">
-                  {reservations.map((reservation) => (
-                    <tr key={reservation._id} className="hover:bg-amber-50/40 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2 text-sm font-medium text-stone-800">
-                          <Calendar size={14} className="text-amber-600" />
-                          {formatDate(reservation.date)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2 text-sm text-stone-700">
-                          <Clock size={14} className="text-amber-600" />
-                          {reservation.time}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-semibold text-stone-800">
-                          {reservation.customerName}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-stone-500 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Mail size={12} />
-                            {reservation.email}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Phone size={12} />
-                            {reservation.phone}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-stone-700">
-                          Table {reservation.tableId?.tableNumber || 'N/A'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2 text-sm text-stone-700">
-                          <Users size={14} className="text-stone-400" />
-                          {reservation.partySize}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={reservation.status}
-                          onChange={(e) => handleStatusChange(reservation._id, e.target.value)}
-                          className={`px-3 py-1 text-xs rounded-full border cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400/40 ${getStatusColor(reservation.status)}`}
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="confirmed">Confirmed</option>
-                          <option value="seated">Seated</option>
-                          <option value="completed">Completed</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => handleDeleteReservation(reservation._id)}
-                          className="text-stone-400 hover:text-red-600 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <>
+            <div className="mb-6 p-5 glass-card rounded-2xl">
+              <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wider">Summary</h3>
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
+                <div className="p-3 bg-stone-50 rounded-xl">
+                  <p className="text-stone-500 text-xs">Total</p>
+                  <p className="text-xl font-bold text-stone-800">{reservations.length}</p>
+                </div>
+                <div className="p-3 bg-yellow-50 rounded-xl">
+                  <p className="text-yellow-600 text-xs">Pending</p>
+                  <p className="text-xl font-bold text-yellow-700">
+                    {reservations.filter(r => r.status === 'pending').length}
+                  </p>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-xl">
+                  <p className="text-blue-600 text-xs">Confirmed</p>
+                  <p className="text-xl font-bold text-blue-700">
+                    {reservations.filter(r => r.status === 'confirmed').length}
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-50 rounded-xl">
+                  <p className="text-purple-600 text-xs">Seated</p>
+                  <p className="text-xl font-bold text-purple-700">
+                    {reservations.filter(r => r.status === 'seated').length}
+                  </p>
+                </div>
+                <div className="p-3 bg-green-50 rounded-xl">
+                  <p className="text-green-600 text-xs">Completed</p>
+                  <p className="text-xl font-bold text-green-700">
+                    {reservations.filter(r => r.status === 'completed').length}
+                  </p>
+                </div>
+                <div className="p-3 bg-red-50 rounded-xl">
+                  <p className="text-red-600 text-xs">Cancelled</p>
+                  <p className="text-xl font-bold text-red-700">
+                    {reservations.filter(r => r.status === 'cancelled').length}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
 
-        <div className="mt-6 p-5 glass-card rounded-2xl">
-          <h3 className="text-sm font-semibold text-stone-700 mb-3 uppercase tracking-wider">Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
-            <div className="p-3 bg-stone-50 rounded-xl">
-              <p className="text-stone-500 text-xs">Total</p>
-              <p className="text-xl font-bold text-stone-800">{reservations.length}</p>
-            </div>
-            <div className="p-3 bg-yellow-50 rounded-xl">
-              <p className="text-yellow-600 text-xs">Pending</p>
-              <p className="text-xl font-bold text-yellow-700">
-                {reservations.filter(r => r.status === 'pending').length}
-              </p>
-            </div>
-            <div className="p-3 bg-blue-50 rounded-xl">
-              <p className="text-blue-600 text-xs">Confirmed</p>
-              <p className="text-xl font-bold text-blue-700">
-                {reservations.filter(r => r.status === 'confirmed').length}
-              </p>
-            </div>
-            <div className="p-3 bg-purple-50 rounded-xl">
-              <p className="text-purple-600 text-xs">Seated</p>
-              <p className="text-xl font-bold text-purple-700">
-                {reservations.filter(r => r.status === 'seated').length}
-              </p>
-            </div>
-            <div className="p-3 bg-green-50 rounded-xl">
-              <p className="text-green-600 text-xs">Completed</p>
-              <p className="text-xl font-bold text-green-700">
-                {reservations.filter(r => r.status === 'completed').length}
-              </p>
-            </div>
-            <div className="p-3 bg-red-50 rounded-xl">
-              <p className="text-red-600 text-xs">Cancelled</p>
-              <p className="text-xl font-bold text-red-700">
-                {reservations.filter(r => r.status === 'cancelled').length}
-              </p>
-            </div>
-          </div>
-        </div>
+            {reservations.length === 0 ? (
+              <div className="text-center py-12 glass-card rounded-2xl">
+                <p className="text-stone-500">No reservations found.</p>
+              </div>
+            ) : (
+              <div className="glass-card rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-stone-100 border-b border-stone-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Time</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Customer Contact</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Table</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Guest</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-stone-100">
+                      {reservations.map((reservation) => (
+                        <tr key={reservation._id} className="hover:bg-amber-50/40 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2 text-sm font-medium text-stone-800">
+                              <Calendar size={14} className="text-amber-600" />
+                              {formatDate(reservation.date)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2 text-sm text-stone-700">
+                              <Clock size={14} className="text-amber-600" />
+                              {reservation.time}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-stone-500 space-y-1">
+                              <div className="flex items-center gap-2">
+                                <Mail size={12} />
+                                {reservation.email}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Phone size={12} />
+                                {reservation.phone}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-stone-700">
+                              Table {reservation.tableId?.tableNumber || 'N/A'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2 text-sm text-stone-700">
+                              <Users size={14} className="text-stone-400" />
+                              {reservation.partySize}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <select
+                              value={reservation.status}
+                              onChange={(e) => handleStatusChange(reservation._id, e.target.value)}
+                              className={`px-3 py-1 text-xs rounded-full border cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400/40 ${getStatusColor(reservation.status)}`}
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="confirmed">Confirmed</option>
+                              <option value="seated">Seated</option>
+                              <option value="completed">Completed</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => handleDeleteReservation(reservation._id)}
+                              className="text-stone-400 hover:text-red-600 transition-colors"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

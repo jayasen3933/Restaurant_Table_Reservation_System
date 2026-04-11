@@ -26,18 +26,22 @@ All pages are protected behind authentication — users **must** log in before a
 - **Forgot Password** flow — token-based password reset with email lookup, time-limited reset tokens (15 min), and redirect back to Login with a success notification
 
 ### Customer Features
+- **Automated Table Availability** - Dynamic availability checking based on existing reservations (no manual admin control required)
 - Search available tables by date, time, and party size
-- Real-time table availability checking
+- Real-time table availability with visual distinction between available and reserved tables
 - Select a table and confirm the reservation with contact details
 - View reservation confirmation with booking summary
+- **Customer Dashboard** - View current/upcoming bookings and complete booking history
 
 ### Admin Features
-- **Dashboard** — View, filter (by date), and manage all reservations with status updates (Pending, Confirmed, Seated, Completed, Cancelled)
-- **Settings** — Add/remove tables, update table status (available/occupied), manage users, and promote or demote user roles
-- **Analytics** — Overview cards (total reservations, today's bookings, total users, total tables), reservation status breakdown, and quick insight metrics (occupancy, completion, and cancellation rates)
+- **Redesigned Dashboard** - Summary section at top, reservations table below with optimized column order (Date, Time, Customer Contact, Table, Guest, Status)
+- View, filter (by date), and manage all reservations with status updates (Pending, Confirmed, Seated, Completed, Cancelled)
+- **Settings** - Add/remove tables, manage users, and promote or demote user roles (table status now automated)
+- **Analytics** - Overview cards (total reservations, today's bookings, total users, total tables), reservation status breakdown, and quick insight metrics (occupancy, completion, and cancellation rates)
 - Database cleanup utility
 
 ### UI / UX
+- **Single Viewport Layout** - Application fits within 100vh with proper overflow handling only on inner containers
 - Warm restaurant theme with amber, stone, and earth tones
 - Playfair Display (serif) headings and Inter (sans-serif) body text via Google Fonts
 - Frosted-glass card components with subtle backdrop blur
@@ -120,6 +124,7 @@ Restaurant_Table_Reservation_System/
 │   │   │   ├── Register.jsx       # User registration
 │   │   │   ├── ForgotPassword.jsx # Email submission for password reset
 │   │   │   ├── ResetPassword.jsx  # New password form (token-based)
+│   │   │   ├── CustomerDashboard.jsx # Customer reservations view
 │   │   │   ├── AdminDashboard.jsx # Reservation management
 │   │   │   ├── AdminSettings.jsx  # Table & user management
 │   │   │   └── AdminAnalytics.jsx # Stats & insights
@@ -208,9 +213,15 @@ The app will be available at `http://localhost:5173`.
 
 ### Booking a Table
 1. On the **Home** page, select a date, time, and party size, then click **Find Available Tables**.
-2. Browse the available tables and select one.
-3. Fill in your contact details (name, email, phone) and click **Confirm Reservation**.
-4. A confirmation screen will display your booking summary.
+2. Browse the available tables (green) and reserved tables (red) for the selected time slot.
+3. Select an available table and fill in your contact details (name, email, phone).
+4. Click **Confirm Reservation** to complete your booking.
+
+### Customer Dashboard
+1. After logging in, click **My Reservations** in the navigation bar.
+2. View your **Current & Upcoming Bookings** (next 7 days) with table details and status.
+3. Review your **Booking History** to see past reservations and completed bookings.
+4. Click **Refresh** to update your reservation list.
 
 ### Admin Access
 1. Register an admin user via the API (see below) or promote an existing user from the Admin Settings panel.
@@ -235,7 +246,6 @@ The app will be available at `http://localhost:5173`.
 |---|---|---|---|
 | `GET` | `/api/tables` | Get all tables | Public |
 | `POST` | `/api/tables` | Create a new table | Admin |
-| `PUT` | `/api/tables/:id` | Update table status | Admin |
 | `DELETE` | `/api/tables/:id` | Delete a table | Admin |
 
 ### Reservations
@@ -243,7 +253,7 @@ The app will be available at `http://localhost:5173`.
 |---|---|---|---|
 | `GET` | `/api/reservations/check-availability` | Check table availability | Public |
 | `POST` | `/api/reservations` | Create a reservation | Public |
-| `GET` | `/api/reservations` | Get all reservations | Admin |
+| `GET` | `/api/reservations` | Get all reservations (supports email filter) | Admin/Customer |
 | `GET` | `/api/reservations/:id` | Get reservation by ID | Protected |
 | `PUT` | `/api/reservations/:id/status` | Update reservation status | Admin |
 | `DELETE` | `/api/reservations/:id` | Delete a reservation | Admin |

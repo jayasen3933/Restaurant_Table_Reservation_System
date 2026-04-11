@@ -35,8 +35,7 @@ exports.checkAvailability = async (req, res) => {
     }
 
     const suitableTables = await Table.find({ 
-      capacity: { $gte: parseInt(partySize) },
-      status: 'available'
+      capacity: { $gte: parseInt(partySize) }
     }).sort({ capacity: 1 });
 
     const bookedTableIds = existingReservations.map(res => res.tableId.toString());
@@ -49,6 +48,7 @@ exports.checkAvailability = async (req, res) => {
       success: true,
       count: availableTables.length,
       data: availableTables,
+      allTables: suitableTables,
       remainingSlots: 4 - currentBookingCount
     });
   } catch (error) {
@@ -128,7 +128,7 @@ exports.createReservation = async (req, res) => {
 
 exports.getAllReservations = async (req, res) => {
   try {
-    const { date, status } = req.query;
+    const { date, status, email } = req.query;
     let query = {};
 
     if (date) {
@@ -143,6 +143,10 @@ exports.getAllReservations = async (req, res) => {
 
     if (status) {
       query.status = status;
+    }
+
+    if (email) {
+      query.email = email;
     }
 
     const reservations = await Reservation.find(query)

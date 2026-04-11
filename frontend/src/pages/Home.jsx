@@ -32,11 +32,11 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen relative">
+    <div className="h-screen flex flex-col relative">
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=1920&q=80')] bg-cover bg-center" />
       <div className="absolute inset-0 bg-gradient-to-b from-stone-900/80 via-stone-900/60 to-stone-900/90" />
 
-      <div className="relative z-10 container mx-auto px-4 py-16">
+      <div className="relative z-10 flex-1 overflow-y-auto container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-700/30 backdrop-blur-sm rounded-full border border-amber-600/20 mb-6">

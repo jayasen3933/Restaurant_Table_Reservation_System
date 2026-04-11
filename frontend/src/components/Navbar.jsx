@@ -54,6 +54,15 @@ const Navbar = () => {
                     <div className="w-px h-6 bg-stone-700 mx-2" />
                   </>
                 )}
+                {!isAdmin && (
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center gap-2 text-sm text-stone-300 hover:text-amber-400 hover:bg-stone-800 px-3 py-2 rounded-lg transition-all"
+                  >
+                    <Calendar size={15} />
+                    My Reservations
+                  </Link>
+                )}
                 <div className="flex items-center gap-2 text-sm text-amber-200 px-3 py-2">
                   <User size={15} />
                   {user?.name}

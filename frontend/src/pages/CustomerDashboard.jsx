@@ -21,7 +21,7 @@ const CustomerDashboard = () => {
   const fetchCustomerReservations = async () => {
     try {
       setLoading(true);
-      const response = await reservationService.getAllReservations({ email: user.email });
+      const response = await reservationService.getAllReservations({ userId: user._id });
       setReservations(response.data || []);
     } catch (error) {
       console.error('Error fetching customer reservations:', error);
@@ -55,8 +55,8 @@ const CustomerDashboard = () => {
   const isUpcoming = (reservation) => {
     const reservationDate = new Date(reservation.date);
     const now = new Date();
-    const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    return reservationDate >= now && reservationDate <= oneWeekFromNow && reservation.status !== 'cancelled';
+    now.setHours(0, 0, 0, 0);
+    return reservationDate >= now && reservation.status !== 'cancelled' && reservation.status !== 'completed';
   };
 
   const upcomingBookings = reservations.filter(isUpcoming);
@@ -76,7 +76,7 @@ const CustomerDashboard = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-stone-50">
+    <div className="min-h-screen bg-stone-50">
       <div className="bg-stone-900 py-8">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between">
@@ -88,18 +88,27 @@ const CustomerDashboard = () => {
                 Manage your restaurant bookings
               </p>
             </div>
-            <button
-              onClick={fetchCustomerReservations}
-              className="px-4 py-2 border border-stone-300 text-stone-600 rounded-lg hover:bg-stone-100 transition-all flex items-center gap-2"
-            >
-              <Calendar size={16} />
-              Refresh
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('/')}
+                className="px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-600 transition-all flex items-center gap-2 font-medium"
+              >
+                <Calendar size={16} />
+                Make a Reservation
+              </button>
+              <button
+                onClick={fetchCustomerReservations}
+                className="px-4 py-2 border border-stone-600 text-stone-300 rounded-lg hover:bg-stone-800 transition-all flex items-center gap-2"
+              >
+                <ArrowLeft size={16} className="rotate-180" />
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8">
         {reservations.length === 0 ? (
           <div className="text-center py-12 glass-card rounded-2xl">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-amber-100 rounded-full mb-6">
@@ -125,10 +134,10 @@ const CustomerDashboard = () => {
               <div className="glass-card rounded-2xl overflow-hidden">
                 <div className="border-b border-stone-200 bg-stone-50 px-6 py-4">
                   <h2 className="font-serif text-xl font-semibold text-stone-800 mb-2">
-                    Current & Upcoming Bookings
+                    Current/Upcoming Bookings
                   </h2>
                   <p className="text-sm text-stone-500">
-                    Your active reservations for the next 7 days
+                    Your active and upcoming reservations
                   </p>
                 </div>
                 <div className="overflow-x-auto">
@@ -186,10 +195,10 @@ const CustomerDashboard = () => {
               <div className="glass-card rounded-2xl overflow-hidden">
                 <div className="border-b border-stone-200 bg-stone-50 px-6 py-4">
                   <h2 className="font-serif text-xl font-semibold text-stone-800 mb-2">
-                    Booking History
+                    Past Bookings
                   </h2>
                   <p className="text-sm text-stone-500">
-                    Your past reservations and completed bookings
+                    Your completed, cancelled, and past reservations
                   </p>
                 </div>
                 <div className="overflow-x-auto">

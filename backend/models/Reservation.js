@@ -36,6 +36,11 @@ const reservationSchema = new mongoose.Schema({
     ref: 'Table',
     required: [true, 'Please provide table ID']
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'seated', 'completed', 'cancelled'],

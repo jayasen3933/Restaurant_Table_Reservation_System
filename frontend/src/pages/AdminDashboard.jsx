@@ -92,7 +92,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-stone-50">
+    <div className="min-h-screen bg-stone-50">
       <div className="bg-stone-900 py-8">
         <div className="container mx-auto px-6 flex justify-between items-start">
           <div>
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
           </button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8">
 
         <div className="mb-6 flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">

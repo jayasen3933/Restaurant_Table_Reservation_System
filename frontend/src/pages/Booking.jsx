@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { reservationService } from '../api/reservationService';
 import { Calendar, Clock, Users, CheckCircle, UtensilsCrossed } from 'lucide-react';
 
 const Booking = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const searchParams = location.state;
 
   const [availableTables, setAvailableTables] = useState([]);
@@ -69,7 +71,8 @@ const Booking = () => {
         date: searchParams.date,
         time: searchParams.time,
         partySize: parseInt(searchParams.partySize),
-        tableId: selectedTable._id
+        tableId: selectedTable._id,
+        userId: user?._id || null
       });
       setBookingSuccess(true);
     } catch (error) {
@@ -77,11 +80,22 @@ const Booking = () => {
     }
   };
 
+  // Redirect to My Reservations after successful booking
+  useEffect(() => {
+    if (bookingSuccess) {
+      const timer = setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [bookingSuccess, navigate]);
+
   if (!searchParams) {
     return null;
   }
 
   if (bookingSuccess) {
+
     return (
       <div className="min-h-screen flex items-center justify-center relative">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=1920&q=80')] bg-cover bg-center" />
@@ -93,23 +107,20 @@ const Booking = () => {
           <h2 className="font-serif text-4xl font-semibold text-white mb-4">
             Reservation Confirmed!
           </h2>
-          <p className="text-stone-300 mb-8 leading-relaxed">
+          <p className="text-stone-300 mb-6 leading-relaxed">
             Your table has been reserved for <span className="text-amber-400 font-medium">{searchParams.date}</span> at <span className="text-amber-400 font-medium">{searchParams.time}</span>.
             A confirmation will be sent to <span className="text-amber-400 font-medium">{contactInfo.email}</span>.
           </p>
-          <button
-            onClick={() => navigate('/')}
-            className="btn-primary text-center"
-          >
-            Make Another Reservation
-          </button>
+          <p className="text-stone-400 text-sm">
+            Redirecting to My Reservations...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-stone-50">
+    <div className="min-h-screen bg-stone-50">
       <div className="bg-stone-900 py-10">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -134,7 +145,7 @@ const Booking = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto container mx-auto px-4 py-10">
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {!loading && remainingSlots > 0 && remainingSlots < 4 && availableTables.length > 0 && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">

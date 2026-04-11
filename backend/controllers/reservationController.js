@@ -58,7 +58,7 @@ exports.checkAvailability = async (req, res) => {
 
 exports.createReservation = async (req, res) => {
   try {
-    const { customerName, email, phone, date, time, partySize, tableId } = req.body;
+    const { customerName, email, phone, date, time, partySize, tableId, userId } = req.body;
 
     const table = await Table.findById(tableId);
     if (!table) {
@@ -101,7 +101,7 @@ exports.createReservation = async (req, res) => {
 
     if (conflictingReservation) {
       return res.status(400).json({ 
-        message: 'This table is already reserved for the selected date and time' 
+        message: 'Book at another time, already another customer booked' 
       });
     }
 
@@ -112,7 +112,8 @@ exports.createReservation = async (req, res) => {
       date: new Date(date + 'T00:00:00.000Z'),
       time: time.trim(),
       partySize,
-      tableId
+      tableId,
+      userId: userId || null
     });
 
     const populatedReservation = await Reservation.findById(reservation._id).populate('tableId');
@@ -128,7 +129,7 @@ exports.createReservation = async (req, res) => {
 
 exports.getAllReservations = async (req, res) => {
   try {
-    const { date, status, email } = req.query;
+    const { date, status, email, userId } = req.query;
     let query = {};
 
     if (date) {
@@ -147,6 +148,10 @@ exports.getAllReservations = async (req, res) => {
 
     if (email) {
       query.email = email;
+    }
+
+    if (userId) {
+      query.userId = userId;
     }
 
     const reservations = await Reservation.find(query)

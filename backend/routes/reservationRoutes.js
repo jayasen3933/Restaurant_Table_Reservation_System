@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/check-availability', checkAvailability);
 
 router.route('/')
-  .get(protect, authorize('admin'), getAllReservations)
+  .get(protect, getAllReservations)  // Allow authenticated users (customers can filter by userId, admins see all)
   .post(createReservation);
 
 router.route('/:id')

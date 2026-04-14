@@ -57,18 +57,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleCleanupDatabase = async () => {
-    if (window.confirm('This will delete all users except Admin and Chada Jayasen, along with their reservations. Continue?')) {
-      try {
-        const response = await api.post('/users/cleanup');
-        alert(`Cleanup complete!\nUsers deleted: ${response.data.details.usersDeleted}\nReservations deleted: ${response.data.details.reservationsDeleted}\nKept: ${response.data.details.keptAdmin}, ${response.data.details.keptCustomer}`);
-        fetchReservations();
-      } catch (error) {
-        alert(error.response?.data?.message || 'Failed to cleanup database');
-      }
-    }
-  };
-
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-IN', {
@@ -103,12 +91,6 @@ const AdminDashboard = () => {
               Manage and track all restaurant reservations
             </p>
           </div>
-          <button
-            onClick={handleCleanupDatabase}
-            className="px-4 py-2 bg-red-700/80 text-white text-sm rounded-lg hover:bg-red-600 transition-colors"
-          >
-            Cleanup Database
-          </button>
         </div>
       </div>
       <div className="container mx-auto px-6 py-8">

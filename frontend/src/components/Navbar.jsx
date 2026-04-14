@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User, Calendar, Settings, BarChart3, UtensilsCrossed } from 'lucide-react';
+import { LogOut, User, Calendar, Settings, BarChart3, UtensilsCrossed, Star } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated, isAdmin } = useAuth();
@@ -43,6 +43,13 @@ const Navbar = () => {
                     >
                       <BarChart3 size={15} />
                       Analytics
+                    </Link>
+                    <Link
+                      to="/admin/reviews"
+                      className="flex items-center gap-2 text-sm text-stone-300 hover:text-amber-400 hover:bg-stone-800 px-3 py-2 rounded-lg transition-all"
+                    >
+                      <Star size={15} />
+                      Reviews
                     </Link>
                     <Link
                       to="/admin/settings"

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Users, Sparkles } from 'lucide-react';
 
@@ -24,12 +24,50 @@ const Home = () => {
     }
   };
 
-  const timeSlots = [
-    '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
-    '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
-    '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM',
-    '8:00 PM', '8:30 PM', '9:00 PM', '9:30 PM'
-  ];
+  // Generate time slots dynamically based on selected date
+  const generateTimeSlots = (dateString) => {
+    if (!dateString) return [];
+    
+    const selectedDate = new Date(dateString);
+    const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 6 = Saturday
+    
+    // Check if weekend (Saturday = 6, Sunday = 0)
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    
+    const slots = [];
+    let startHour, endHour;
+    
+    if (isWeekend) {
+      // Weekend: 10:00 AM to 11:00 PM
+      startHour = 10;
+      endHour = 23;
+    } else {
+      // Weekday: 11:00 AM to 10:00 PM
+      startHour = 11;
+      endHour = 22;
+    }
+    
+    // Generate 30-minute intervals
+    for (let hour = startHour; hour <= endHour; hour++) {
+      for (let minutes of [0, 30]) {
+        // Skip the last 30-minute slot if it exceeds end time
+        if (hour === endHour && minutes === 30) continue;
+        
+        const period = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+        const displayMinutes = minutes === 0 ? '00' : minutes;
+        
+        slots.push(`${displayHour}:${displayMinutes} ${period}`);
+      }
+    }
+    
+    return slots;
+  };
+
+  // Memoize time slots based on selected date
+  const timeSlots = useMemo(() => {
+    return generateTimeSlots(formData.date);
+  }, [formData.date]);
 
   return (
     <div className="min-h-screen relative">

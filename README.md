@@ -34,6 +34,17 @@ All pages are protected behind authentication — users **must** log in before a
   - **Current/Upcoming Bookings** — Active and future reservations
   - **Past Bookings** — Completed, cancelled, and historical reservations
   - Displays: Table Number, Date, Time, Number of Guests, Status
+  - **Leave Review** button for completed reservations
+- **Review System** — Customers can rate and review completed reservations:
+  - 5-star rating system
+  - Multiple review categories (Food, Service, Ambiance, Cleanliness, Overall)
+  - 500-character review comments
+  - Only available for completed reservations
+  - One review per reservation
+- **Support & Contact Page** — Comprehensive support for customer queries and complaints:
+  - Restaurant contact information (phone, email, address, business hours)
+  - Common issues guide (table issues, food quality, staff behavior, reservations)
+  - Quick access from dashboard header
 - **User-specific data** — Backend queries filter by authenticated user's ID (customers only see their own reservations)
 - Quick access to make new reservations from dashboard header
 - Full page scrolling enabled on all pages
@@ -42,7 +53,9 @@ All pages are protected behind authentication — users **must** log in before a
 - **Dashboard** — View, filter (by date), and manage all reservations with status updates (Pending, Confirmed, Seated, Completed, Cancelled)
 - **Optimized column order** — Date, Time, Customer Contact, Table, Guests, Status for better workflow
 - **Settings** — Add/remove tables, manage users, and promote or demote user roles
+  - **Automated table booking** — Tables are automatically marked as booked/available based on reservations (no manual status management required)
 - **Analytics** — Overview cards (total reservations, today's bookings, total users, total tables), reservation status breakdown, and quick insight metrics (occupancy, completion, and cancellation rates)
+- **Review Management** — View and moderate customer reviews
 - **Full page scrolling** — All admin pages fully scrollable to view complete data sets
 - Database cleanup utility
 
@@ -247,6 +260,30 @@ The app will be available at `http://localhost:5173`.
 
 **Important:** The system fetches ONLY your reservations using your authenticated user ID. You will never see reservations made by other customers.
 
+### Leaving a Review
+1. After your reservation is completed, go to **My Reservations** (Customer Dashboard).
+2. In the **Past Bookings** section, find your completed reservation.
+3. Click the **Leave Review** button next to the reservation.
+4. In the review modal:
+   - Select a rating (1-5 stars)
+   - Choose a category (Overall, Food, Service, Ambiance, Cleanliness)
+   - Write your review (up to 500 characters)
+5. Click **Submit Review** to share your experience.
+6. You can only review each reservation once.
+
+### Getting Support
+1. Click the **Support** button in your dashboard header.
+2. View restaurant contact information:
+   - Phone numbers for immediate assistance
+   - Email addresses for detailed inquiries
+   - Physical address and business hours
+3. Browse the common issues guide for:
+   - Table-related problems
+   - Food quality concerns
+   - Service and staff behavior issues
+   - Reservation modifications
+   - Any other complaints or feedback
+
 ### Admin Access
 1. Register an admin user via the API (see below) or promote an existing user from the Admin Settings panel.
 2. Log in with admin credentials — you will be directed to the **Admin Dashboard**.
@@ -284,6 +321,16 @@ The app will be available at `http://localhost:5173`.
 | `DELETE` | `/api/reservations/:id` | Delete a reservation | Admin |
 
 **Important:** The `GET /api/reservations` endpoint now allows **authenticated customers** to fetch their own reservations by passing `userId` as a query parameter. Admins can view all reservations.
+
+### Reviews
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `GET` | `/api/reviews/can-review` | Check if user can review a reservation | Public |
+| `POST` | `/api/reviews` | Create a new review | Protected |
+| `GET` | `/api/reviews` | Get all reviews (supports userId, status filters) | Protected |
+| `GET` | `/api/reviews/:id` | Get review by ID | Protected |
+| `PUT` | `/api/reviews/:id/status` | Update review status (approve/reject) | Admin |
+| `DELETE` | `/api/reviews/:id` | Delete a review | Admin |
 
 ### Users (Admin Only)
 | Method | Endpoint | Description | Auth |

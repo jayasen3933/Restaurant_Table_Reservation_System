@@ -11,7 +11,9 @@ import ResetPassword from './pages/ResetPassword';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminSettings from './pages/AdminSettings';
 import AdminAnalytics from './pages/AdminAnalytics';
+import AdminReviews from './pages/AdminReviews';
 import CustomerDashboard from './pages/CustomerDashboard';
+import Support from './pages/Support';
 
 function App() {
   return (
@@ -28,9 +30,11 @@ function App() {
               <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
               <Route path="/booking" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><CustomerDashboard /></ProtectedRoute>} />
+              <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
               <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
               <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+              <Route path="/admin/reviews" element={<ProtectedRoute><AdminReviews /></ProtectedRoute>} />
             </Routes>
           </div>
         </div>

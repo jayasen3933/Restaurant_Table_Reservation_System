@@ -66,14 +66,6 @@ const AdminSettings = () => {
     }
   };
 
-  const handleUpdateTableStatus = async (id, status) => {
-    try {
-      await tableService.updateTableStatus(id, status);
-      fetchData();
-    } catch (error) {
-      alert(error.response?.data?.message || 'Failed to update table status');
-    }
-  };
 
   const handleUpdateUserRole = async (id, role) => {
     try {
@@ -211,7 +203,6 @@ const AdminSettings = () => {
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase">Table Number</th>
                       <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase">Capacity</th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase">Status</th>
                       <th className="px-6 py-3 text-left text-xs font-semibold text-stone-600 uppercase">Actions</th>
                     </tr>
                   </thead>
@@ -223,20 +214,6 @@ const AdminSettings = () => {
                         </td>
                         <td className="px-6 py-4 text-sm text-stone-600">
                           {table.capacity} guests
-                        </td>
-                        <td className="px-6 py-4">
-                          <select
-                            value={table.status}
-                            onChange={(e) => handleUpdateTableStatus(table._id, e.target.value)}
-                            className={`px-3 py-1 text-xs rounded-full border cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400/40 ${
-                              table.status === 'available'
-                                ? 'bg-green-50 text-green-700 border-green-200'
-                                : 'bg-red-50 text-red-700 border-red-200'
-                            }`}
-                          >
-                            <option value="available">Available</option>
-                            <option value="occupied">Occupied</option>
-                          </select>
                         </td>
                         <td className="px-6 py-4">
                           <button

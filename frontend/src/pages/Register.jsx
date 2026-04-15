@@ -96,7 +96,7 @@ const Register = () => {
                 onChange={handleChange}
                 required
                 className="input-restaurant"
-                placeholder="John Doe"
+                placeholder="Your Name"
               />
             </div>
 

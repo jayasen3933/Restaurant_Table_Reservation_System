@@ -14,6 +14,7 @@ import AdminAnalytics from './pages/AdminAnalytics';
 import AdminReviews from './pages/AdminReviews';
 import CustomerDashboard from './pages/CustomerDashboard';
 import Support from './pages/Support';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
               <Route path="/booking" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><CustomerDashboard /></ProtectedRoute>} />
               <Route path="/support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
               <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />

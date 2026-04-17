@@ -60,6 +60,10 @@ exports.createReservation = async (req, res) => {
   try {
     const { customerName, email, phone, date, time, partySize, tableId, userId } = req.body;
 
+    console.log('=== Creating Reservation ===');
+    console.log('Received userId:', userId);
+    console.log('Request body:', req.body);
+
     const table = await Table.findById(tableId);
     if (!table) {
       return res.status(404).json({ message: 'Table not found' });
@@ -116,6 +120,9 @@ exports.createReservation = async (req, res) => {
       userId: userId || null
     });
 
+    console.log('Created reservation with userId:', reservation.userId);
+    console.log('Reservation ID:', reservation._id);
+
     const populatedReservation = await Reservation.findById(reservation._id).populate('tableId');
 
     res.status(201).json({
@@ -131,6 +138,10 @@ exports.getAllReservations = async (req, res) => {
   try {
     const { date, status, email, userId } = req.query;
     let query = {};
+
+    console.log('=== Getting All Reservations ===');
+    console.log('Query params:', req.query);
+    console.log('Received userId:', userId);
 
     if (date) {
       const requestedDate = new Date(date + 'T00:00:00.000Z');
@@ -154,9 +165,14 @@ exports.getAllReservations = async (req, res) => {
       query.userId = userId;
     }
 
+    console.log('MongoDB query:', query);
+
     const reservations = await Reservation.find(query)
       .populate('tableId')
       .sort({ date: 1, time: 1 });
+
+    console.log('Found reservations:', reservations.length);
+    console.log('Reservation userIds:', reservations.map(r => ({ id: r._id, userId: r.userId })));
 
     res.status(200).json({
       success: true,

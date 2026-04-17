@@ -66,16 +66,23 @@ const Booking = () => {
   const handleBooking = async (e) => {
     e.preventDefault();
     try {
+      // Get userId - backend returns 'id', not '_id'
+      const userId = user?.id || user?._id;
+      
+      console.log('Creating reservation with userId:', userId);
+      console.log('User object:', user);
+      
       await reservationService.createReservation({
         ...contactInfo,
         date: searchParams.date,
         time: searchParams.time,
         partySize: parseInt(searchParams.partySize),
         tableId: selectedTable._id,
-        userId: user?._id || null
+        userId: userId || null
       });
       setBookingSuccess(true);
     } catch (error) {
+      console.error('Booking error:', error);
       alert(error.response?.data?.message || 'Failed to create reservation');
     }
   };

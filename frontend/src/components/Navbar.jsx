@@ -70,10 +70,13 @@ const Navbar = () => {
                     My Reservations
                   </Link>
                 )}
-                <div className="flex items-center gap-2 text-sm text-amber-200 px-3 py-2">
+                <Link
+                  to="/profile"
+                  className="flex items-center gap-2 text-sm text-stone-300 hover:text-amber-400 hover:bg-stone-800 px-3 py-2 rounded-lg transition-all"
+                >
                   <User size={15} />
-                  {user?.name}
-                </div>
+                  Profile
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 text-sm text-stone-400 hover:text-red-400 hover:bg-stone-800 px-3 py-2 rounded-lg transition-all"

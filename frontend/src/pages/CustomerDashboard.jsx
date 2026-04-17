@@ -29,10 +29,31 @@ const CustomerDashboard = () => {
   const fetchCustomerReservations = async () => {
     try {
       setLoading(true);
-      const response = await reservationService.getAllReservations({ userId: user._id });
+      // Use user.id (backend returns 'id', not '_id')
+      const userId = user?.id || user?._id;
+      
+      console.log('=== Fetching Reservations ===');
+      console.log('User object:', user);
+      console.log('Extracted userId:', userId);
+      
+      if (!userId) {
+        console.error('No user ID found');
+        setReservations([]);
+        setLoading(false);
+        return;
+      }
+      
+      console.log('Calling API with userId:', userId);
+      const response = await reservationService.getAllReservations({ userId });
+      
+      console.log('API Response:', response);
+      console.log('Reservations data:', response.data);
+      console.log('Number of reservations:', response.data?.length || 0);
+      
       setReservations(response.data || []);
     } catch (error) {
       console.error('Error fetching customer reservations:', error);
+      console.error('Error details:', error.response?.data);
     } finally {
       setLoading(false);
     }

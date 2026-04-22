@@ -1,83 +1,90 @@
 # La Maison - Restaurant Table Reservation System
 
-A full-stack **MERN** application for reserving restaurant tables online, checking real-time availability, and managing reservations through a comprehensive admin dashboard. Styled with a warm, premium restaurant theme featuring amber and stone tones, serif typography, and frosted-glass UI elements.
+A production-grade, full-stack **MERN** application for online restaurant table reservations with real-time availability tracking and comprehensive administrative controls. Built with enterprise-level architecture and styled with a sophisticated restaurant aesthetic featuring amber and stone color palettes, serif typography, and glassmorphic UI components.
+
+**🚀 Live Deployment:** Continuously deployed with frontend on **Vercel** and backend on **Render**, connected to **MongoDB Atlas**.
 
 ---
 
 ## Project Overview
 
-La Maison is an end-to-end table reservation platform designed for both customers and restaurant administrators:
+La Maison is a scalable, end-to-end table reservation platform engineered for both customer-facing operations and administrative management:
 
-* **Customers** create an account, log in, search for available tables by date/time/party size, confirm bookings with contact details, and view their personal reservation history in a dedicated dashboard.
-* **Admins** manage reservations (approve, seat, complete, or cancel), add or remove tables, manage users and roles, and review analytics from a dedicated dashboard.
+* **Customers** authenticate securely, search available tables by date/time/party size with dynamic time slot generation, complete bookings with validated contact information, and access personalized reservation dashboards with historical data.
+* **Administrators** orchestrate reservation workflows (approval, seating, completion, cancellation), manage table inventory, control user roles and permissions, and analyze operational metrics through dedicated dashboards.
 
-*All pages are protected behind authentication — users must log in before accessing any part of the application.*
+*All routes are protected by JWT-based authentication middleware — unauthorized access attempts are intercepted and redirected to the login portal.*
 
 ---
 
 ## Features
 
 ### Authentication & Security
-* JWT-based authentication with secure password hashing (bcrypt).
-* Protected routes — unauthenticated visitors are redirected to the Login page.
-* Separate registration and login flow — new users are redirected to Login after sign-up and must manually authenticate.
-* Role-based access control (Customer / Admin).
-* Persistent error messages on login failure.
-* **Forgot Password flow** — token-based password reset with email lookup, time-limited reset tokens (15 min), and success notifications.
-* **Show/Hide Password toggle** — Eye icon and checkbox on login page for better UX.
+* **JWT-based stateless authentication** with bcrypt password hashing (10 salt rounds).
+* **Route protection middleware** — unauthorized requests are intercepted and redirected to authentication portal.
+* **Decoupled registration and login flows** — new users complete registration, then authenticate separately to receive JWT tokens.
+* **Role-based access control (RBAC)** — granular permissions for Customer and Admin roles.
+* **Contextual error handling** — specific, user-friendly error messages for failed authentication attempts.
+* **Password recovery system** — secure, token-based password reset with email verification, time-limited tokens (15-minute expiry), and confirmation notifications.
+* **Enhanced UX controls** — password visibility toggle with eye icon for improved form usability.
 
 ### Customer Features
-* Search available tables by date, time, and party size.
-* **Dynamic time slots** based on day of week:
+* **Intelligent search interface** — query available tables by date, time, and party size with instant results.
+* **Dynamic time slot generation** — business hours adapt based on day of week:
     * **Weekdays (Mon-Fri)**: 11:00 AM - 10:00 PM (30-minute intervals).
     * **Weekends (Sat-Sun)**: 10:00 AM - 11:00 PM (30-minute intervals).
-* Real-time table availability checking with visual indicators (green = available, red = reserved).
-* Select a table and confirm the reservation with contact details.
-* Automatic redirection to "My Reservations" dashboard after successful booking (2-second delay).
-* **Personal Dashboard** showing user-specific reservation history:
-    * *Current/Upcoming Bookings* — Active and future reservations.
-    * *Past Bookings* — Completed, cancelled, and historical reservations.
-    * Displays: Table Number, Date, Time, Number of Guests, Status.
-    * **Refresh button** with circular refresh icon (↻) to update reservation list.
-* **Review System**:
-    * 5-star rating system with categories (Food, Service, Ambiance, Cleanliness, Overall).
-    * 500-character review comments.
-    * Only available for completed reservations (one review per reservation).
-    * Fixed user session handling for reliable review submission.
-* **Support & Contact Page**:
-    * **Clickable phone numbers** — Opens phone dialer (+91 6300251692, +91 6301716173).
-    * **Clickable email addresses** — Opens email client (support@lamaison.com, chadajayasenareddy123@gmail.com).
-    * **Clickable address** — Opens Google Maps (2-7-303, Excise Colony, Hanamkonda, 506001).
-    * Business hours: Mon-Fri (11 AM - 10 PM), Sat-Sun (10 AM - 11 PM).
-    * Common issues guide and quick access from dashboard header.
-* User-specific data — Backend queries filter by authenticated user's ID (customers only see their own reservations).
+    * **IST timezone validation** — past time slots automatically disabled for current day bookings.
+* **Real-time availability engine** — visual status indicators (green = available, red = reserved) with instant updates.
+* **Streamlined booking flow** — table selection with validated contact information (10-digit phone validation, email verification).
+* **Post-booking automation** — automatic redirection to personal dashboard with 2-second confirmation delay.
+* **Personalized reservation dashboard** — user-scoped data with segregated views:
+    * *Current/Upcoming Bookings* — Active and scheduled reservations.
+    * *Past Bookings* — Historical records (completed, cancelled).
+    * **Data display**: Table number, date, time, party size, reservation status.
+    * **Manual refresh control** — circular refresh icon for on-demand data synchronization.
+* **Customer review system**:
+    * **5-star rating mechanism** with categorical feedback (Food Quality, Service, Ambiance, Cleanliness, Overall Experience).
+    * **500-character limit** for detailed comments.
+    * **Reservation-gated reviews** — only completed bookings eligible (one review per reservation).
+    * **Session persistence** — reliable submission handling with user context preservation.
+* **Integrated support portal**:
+    * **Click-to-call functionality** — direct phone dialer integration (+91 6300251692, +91 6301716173).
+    * **Click-to-email links** — instant email client launch (support@lamaison.com, chadajayasenareddy123@gmail.com).
+    * **Google Maps integration** — one-click navigation to restaurant location (2-7-303, Excise Colony, Hanamkonda, 506001).
+    * **Operating hours display**: Mon-Fri (11 AM - 10 PM), Sat-Sun (10 AM - 11 PM).
+    * **FAQ section** — common issues guide with quick access from dashboard navigation.
+* **Data isolation** — backend implements user ID filtering to ensure customers only access their own reservation data.
 
 ### Admin Features
-* **Dashboard** — View, filter (by date), and manage all reservations with status updates (Pending, Confirmed, Seated, Completed, Cancelled).
-* **Optimized column order** — Date, Time, Customer Contact, Table, Guests, Status for better workflow.
-* **Settings** — Add/remove tables, manage users, and promote or demote user roles.
-    * **Automated table booking** — Tables are automatically marked as booked/available based on reservations (no manual status management required).
-* **Analytics** — Overview cards (total reservations, today's bookings, total users, total tables), reservation status breakdown, and quick insight metrics (occupancy, completion, and cancellation rates).
-* **Review Management** — View all customer reviews with filtering (All, Pending, Approved, Rejected):
-    * Approve or reject reviews.
-    * Delete inappropriate reviews.
-    * Display customer name, rating stars, category, comment, and submission date.
-    * Accessible via admin navbar (Reviews link between Analytics and Settings).
-* Full page scrolling — All admin pages fully scrollable to view complete data sets.
+* **Centralized reservation dashboard** — comprehensive view with date-based filtering and status management (Pending, Confirmed, Seated, Completed, Cancelled).
+* **Workflow-optimized layout** — column ordering prioritizes operational efficiency: Date, Time, Customer Contact, Table, Party Size, Status.
+* **System configuration panel** — table inventory management, user administration, and role-based permission controls.
+    * **Automated availability tracking** — table status dynamically updates based on reservation state (eliminates manual status management).
+* **Business intelligence dashboard** — real-time metrics with overview cards:
+    * **Key performance indicators**: Total reservations, daily bookings, user count, table inventory.
+    * **Status distribution analytics** — visual breakdown of reservation states.
+    * **Operational insights**: Occupancy rate, completion rate, cancellation rate.
+* **Review moderation system** — comprehensive feedback management with multi-filter views (All, Approved, Rejected):
+    * **Approval workflow** — accept or reject customer reviews.
+    * **Content moderation** — delete inappropriate or policy-violating reviews.
+    * **Rich data display** — customer name, star rating, category, comment text, submission timestamp.
+    * **Navigation integration** — accessible via admin navbar between Analytics and Settings.
+* **Responsive data presentation** — all admin interfaces support full-page scrolling for large datasets without content truncation.
 
 ### Automated Booking Protection
-* **Strict concurrency control** — Prevents double-booking at the database level.
-* **Real-time validation** — Checks for existing reservations before confirming.
-* **User-friendly error messages** — "Book at another time, already another customer booked."
-* **Maximum capacity limits** — 4 reservations per time slot.
+* **Database-level concurrency control** — atomic operations prevent race conditions and double-booking scenarios.
+* **Pre-commit validation layer** — real-time conflict detection before reservation persistence.
+* **Contextual error messaging** — clear, actionable feedback ("This time slot is already booked. Please select a different time.").
+* **Capacity management** — enforced limit of 4 concurrent reservations per time slot to maintain service quality.
 
 ### UI / UX
-* Warm restaurant theme with amber, stone, and earth tones.
-* Playfair Display (serif) headings and Inter (sans-serif) body text via Google Fonts.
-* Frosted-glass card components with subtle backdrop blur.
-* Full page scrolling — All pages use `min-h-screen` with natural scrolling (no content cut off).
-* Responsive layout across desktop and mobile.
-* Lucide React icons throughout the interface (including RefreshCw, Eye, EyeOff, Star, Phone, MapPin).
+* **Premium design system** — warm color palette with amber, stone, and earth tones for sophisticated restaurant branding.
+* **Typography hierarchy** — Playfair Display (serif) for headings, Inter (sans-serif) for body text, loaded via Google Fonts CDN.
+* **Glassmorphic components** — frosted-glass card elements with backdrop blur effects for modern depth perception.
+* **Responsive architecture** — fluid layouts with `min-h-screen` containers, natural scrolling, and mobile-first breakpoints.
+* **Cross-device compatibility** — optimized for desktop, tablet, and mobile viewports with Tailwind CSS responsive utilities.
+* **Icon system** — Lucide React library for consistent, scalable vector icons (RefreshCw, Eye, EyeOff, Star, Phone, MapPin, etc.).
+* **Mobile optimizations** — horizontal scroll prevention, touch-friendly controls, 10-digit phone validation with real-time feedback.
 
 ---
 
@@ -86,25 +93,27 @@ La Maison is an end-to-end table reservation platform designed for both customer
 ### Frontend
 | Technology | Purpose |
 | :--- | :--- |
-| **React 19** | UI framework |
-| **Vite 8** | Build tool and dev server |
-| **React Router 7** | Client-side routing and protected routes |
-| **Tailwind CSS 3** | Utility-first styling with custom theme |
-| **Axios** | HTTP client with request/response interceptors |
-| **Lucide React** | Icon library |
-| **Google Fonts** | Playfair Display & Inter typography |
+| **React 19** | Component-based UI framework with hooks and context API |
+| **Vite 8** | Next-generation build tool with HMR and optimized bundling |
+| **React Router 7** | Declarative client-side routing with protected route guards |
+| **Tailwind CSS 3** | Utility-first CSS framework with custom design tokens |
+| **Axios** | Promise-based HTTP client with interceptors for auth headers |
+| **Lucide React** | Lightweight, customizable icon library |
+| **Google Fonts** | Web font service for Playfair Display & Inter typography |
+| **Vercel** | Continuous deployment platform with edge network CDN |
 
 ### Backend
 | Technology | Purpose |
 | :--- | :--- |
-| **Node.js** | JavaScript runtime |
-| **Express 5** | Web server framework |
-| **MongoDB** | NoSQL database |
-| **Mongoose 9** | ODM for MongoDB |
-| **JSON Web Tokens** | Stateless authentication |
-| **bcryptjs** | Password hashing |
-| **dotenv** | Environment variable management |
-| **nodemon** | Development auto-restart |
+| **Node.js** | JavaScript runtime environment (v18+) |
+| **Express 5** | Minimalist web application framework with middleware support |
+| **MongoDB Atlas** | Cloud-hosted NoSQL database with automated backups |
+| **Mongoose 9** | Elegant MongoDB object modeling with schema validation |
+| **JSON Web Tokens** | Secure, stateless authentication with signed tokens |
+| **bcryptjs** | Adaptive password hashing with configurable salt rounds |
+| **dotenv** | Environment variable loader for configuration management |
+| **nodemon** | Development utility for automatic server restarts |
+| **Render** | Cloud platform for backend hosting with auto-scaling |
 
 ---
 
@@ -181,8 +190,8 @@ Restaurant_Table_Reservation_System/
 
 ### Prerequisites
 * **Node.js** v18 or higher
-* **MongoDB** (local instance or MongoDB Atlas)
-* **npm**
+* **MongoDB Atlas** account (or local MongoDB instance for development)
+* **npm** or **yarn** package manager
 
 ### 1. Clone the Repository
 
@@ -202,11 +211,20 @@ Create a `.env` file in the `backend/` directory:
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/restaurant_reservation
-JWT_SECRET=your_jwt_secret_key_change_this_in_production
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/restaurant_reservation?retryWrites=true&w=majority
+JWT_SECRET=<your_cryptographically_secure_jwt_secret>
+FRONTEND_URL=https://your-project.vercel.app
+NODE_ENV=production
 ```
 
-Start the server:
+**Environment Variable Descriptions:**
+* `PORT` — Server port (default: 5000)
+* `MONGO_URI` — MongoDB Atlas connection string with credentials
+* `JWT_SECRET` — Cryptographically secure secret for token signing (use `openssl rand -base64 32`)
+* `FRONTEND_URL` — Deployed frontend URL for CORS configuration
+* `NODE_ENV` — Environment mode (`development` or `production`)
+
+Start the development server:
 
 ```bash
 npm run dev
@@ -221,6 +239,22 @@ Open a **new terminal** window:
 ```bash
 cd frontend
 npm install
+```
+
+Create a `.env` file in the `frontend/` directory:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+**For production deployment**, update to your backend URL:
+```env
+VITE_API_URL=https://your-backend.onrender.com/api
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
@@ -231,29 +265,36 @@ The app will be available at `http://localhost:5173`.
 ## Usage Guide
 
 ### Creating an Account
-1. Click **"Sign up"**, fill in your details, and log in.
+1. Navigate to the registration page and complete the sign-up form with validated inputs.
+2. After successful registration, authenticate via the login portal to receive your JWT token.
 
 ### Booking a Table
-1. Select a date/time on the Home page, choose a table, and confirm.
-2. You will be auto-redirected to your dashboard.
+1. Use the intelligent search interface on the Home page to select date, time, and party size.
+2. Review available tables with real-time status indicators.
+3. Select your preferred table and complete the booking form with validated contact information.
+4. Receive instant confirmation and automatic redirection to your personalized dashboard.
 
 ### Viewing Reservations
-1. Go to **"My Reservations"** to see upcoming and past bookings.
-2. **Note:** You will only see your own reservations.
+1. Access **"My Reservations"** from the navigation menu.
+2. View segregated lists of current/upcoming and past bookings.
+3. Use the refresh button for on-demand data synchronization.
+4. **Data Isolation:** You will only see reservations associated with your authenticated user account.
 
 ### Leaving a Review
-1. Find a completed reservation in **"Past Bookings"** and click **"Leave Review"**.
-2. Select rating (1-5 stars), category, and write your comment (up to 500 characters).
-3. Submit to share your experience.
+1. Navigate to **"Past Bookings"** and locate a completed reservation.
+2. Click **"Leave Review"** to open the feedback form.
+3. Select a star rating (1-5), choose a category, and compose your comment (500-character limit).
+4. Submit to contribute to the restaurant's review database.
 
 ### Getting Support
-1. Click **"Support"** in your dashboard header.
-2. Access clickable phone numbers, email addresses, and Google Maps location.
-3. View business hours and common issues guide.
+1. Click **"Support"** in the dashboard navigation.
+2. Utilize click-to-call, click-to-email, and Google Maps integration for instant contact.
+3. Review operating hours and FAQ section for common inquiries.
 
 ### Admin Access
-1. Log in with an admin account to access the **Admin Dashboard**, **Settings**, **Analytics**, and **Reviews**.
-2. Admin pages support full scrolling for large data sets.
+1. Authenticate with an admin-role account to unlock administrative features.
+2. Access **Admin Dashboard** for reservation management, **Settings** for system configuration, **Analytics** for business intelligence, and **Reviews** for content moderation.
+3. All admin interfaces support full-page scrolling for comprehensive data visualization.
 
 ---
 
@@ -288,7 +329,9 @@ The app will be available at `http://localhost:5173`.
 
 ## Creating an Admin User
 
-Register an admin account via your API client (like Postman):
+**Method 1: Direct API Registration**
+
+Use an API client (Postman, Insomnia, or cURL) to register an admin account:
 
 ```http
 POST http://localhost:5000/api/auth/register
@@ -297,12 +340,14 @@ Content-Type: application/json
 {
   "name": "Admin User",
   "email": "admin@restaurant.com",
-  "password": "admin123",
+  "password": "SecureAdminPassword123!",
   "role": "admin"
 }
 ```
 
-Alternatively, log in as an existing admin and promote any user from the **Admin Settings > Users** tab.
+**Method 2: Role Promotion**
+
+Authenticate with an existing admin account and promote any user via **Admin Settings > Users** tab using the role management interface.
 
 ---
 

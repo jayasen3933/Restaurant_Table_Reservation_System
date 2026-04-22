@@ -20,6 +20,7 @@ const Booking = () => {
     email: '',
     phone: ''
   });
+  const [phoneError, setPhoneError] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [remainingSlots, setRemainingSlots] = useState(4);
   const [slotMessage, setSlotMessage] = useState('');
@@ -57,14 +58,52 @@ const Booking = () => {
   };
 
   const handleContactChange = (e) => {
-    setContactInfo({
-      ...contactInfo,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    
+    // Special handling for phone number
+    if (name === 'phone') {
+      // Remove all non-numeric characters
+      const numericValue = value.replace(/\D/g, '');
+      
+      // Limit to 10 digits
+      const limitedValue = numericValue.slice(0, 10);
+      
+      setContactInfo({
+        ...contactInfo,
+        [name]: limitedValue
+      });
+      
+      // Validate phone number
+      if (limitedValue.length > 0 && limitedValue.length < 10) {
+        setPhoneError('Please enter a valid 10-digit mobile number');
+      } else if (limitedValue.length === 10) {
+        setPhoneError('');
+      } else {
+        setPhoneError('');
+      }
+    } else {
+      setContactInfo({
+        ...contactInfo,
+        [name]: value
+      });
+    }
+  };
+  
+  const handlePhoneBlur = () => {
+    if (contactInfo.phone.length > 0 && contactInfo.phone.length !== 10) {
+      setPhoneError('Please enter a valid 10-digit mobile number');
+    }
   };
 
   const handleBooking = async (e) => {
     e.preventDefault();
+    
+    // Validate phone number before submission
+    if (contactInfo.phone.length !== 10) {
+      setPhoneError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    
     try {
       // Get userId - backend returns 'id', not '_id'
       const userId = user?.id || user?._id;
@@ -127,14 +166,14 @@ const Booking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      <div className="bg-stone-900 py-10">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="font-serif text-4xl font-semibold text-white mb-4">
+    <div className="min-h-screen bg-stone-50 overflow-x-hidden w-full max-w-[100vw]">
+      <div className="bg-stone-900 py-6 md:py-10">
+        <div className="container mx-auto px-4 max-w-full">
+          <div className="max-w-4xl mx-auto w-full">
+            <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-3 md:mb-4">
               Available Tables
             </h1>
-            <div className="flex items-center gap-6 text-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-sm">
               <div className="flex items-center gap-2 text-amber-300">
                 <Calendar size={16} />
                 {new Date(searchParams.date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -152,8 +191,8 @@ const Booking = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-full">
+        <div className="max-w-4xl mx-auto w-full">
           {!loading && remainingSlots > 0 && remainingSlots < 4 && availableTables.length > 0 && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
               <p className="text-sm text-amber-800 font-medium">
@@ -191,14 +230,14 @@ const Booking = () => {
               </button>
             </div>
           ) : availableTables.length === 0 && slotMessage ? null : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {!showContactForm ? (
                 allTables.map((table) => {
                   const isAvailable = availableTables.some(t => t._id === table._id);
                   return (
                     <div
                       key={table._id}
-                      className={`glass-card rounded-2xl p-6 hover:shadow-xl transition-all ${
+                      className={`glass-card rounded-xl md:rounded-2xl p-4 md:p-6 hover:shadow-xl transition-all ${
                         isAvailable 
                           ? 'hover:border-amber-300 cursor-pointer group' 
                           : 'opacity-60 border-stone-300 cursor-not-allowed'
@@ -207,7 +246,7 @@ const Booking = () => {
                     >
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className={`font-serif text-xl font-semibold transition-colors ${
+                          <h3 className={`font-serif text-lg md:text-xl font-semibold transition-colors ${
                             isAvailable 
                               ? 'text-stone-800 group-hover:text-amber-800' 
                               : 'text-stone-500'
@@ -240,10 +279,10 @@ const Booking = () => {
                   );
                 })
               ) : (
-                <div className="col-span-2">
-                  <div className="glass-card rounded-2xl p-8">
-                    <div className="mb-6">
-                      <h2 className="font-serif text-2xl font-semibold text-stone-800 mb-2">
+                <div className="col-span-1 md:col-span-2">
+                  <div className="glass-card rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8">
+                    <div className="mb-4 md:mb-6">
+                      <h2 className="font-serif text-xl md:text-2xl font-semibold text-stone-800 mb-2">
                         Complete Your Reservation
                       </h2>
                       <p className="text-sm text-stone-500">
@@ -291,23 +330,28 @@ const Booking = () => {
                           name="phone"
                           value={contactInfo.phone}
                           onChange={handleContactChange}
+                          onBlur={handlePhoneBlur}
+                          maxLength={10}
                           required
-                          className="input-restaurant"
-                          placeholder="+91 12345 67890"
+                          className={`input-restaurant ${phoneError ? 'border-red-500 focus:ring-red-500' : ''}`}
+                          placeholder="10-digit mobile number"
                         />
+                        {phoneError && (
+                          <p className="text-red-600 text-sm mt-1 font-medium">{phoneError}</p>
+                        )}
                       </div>
 
-                      <div className="flex gap-4 pt-4">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                         <button
                           type="button"
                           onClick={() => setShowContactForm(false)}
-                          className="flex-1 btn-secondary text-center"
+                          className="w-full sm:flex-1 btn-secondary text-center py-3"
                         >
                           Back
                         </button>
                         <button
                           type="submit"
-                          className="flex-1 btn-primary text-center"
+                          className="w-full sm:flex-1 btn-primary text-center py-3"
                         >
                           Confirm Reservation
                         </button>

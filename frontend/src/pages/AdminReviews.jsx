@@ -63,7 +63,6 @@ const AdminReviews = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
       approved: 'bg-green-50 text-green-700 border-green-200',
       rejected: 'bg-red-50 text-red-700 border-red-200'
     };
@@ -109,7 +108,7 @@ const AdminReviews = () => {
 
       <div className="container mx-auto px-6 py-8">
         {/* Filter Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => setFilter('all')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -119,16 +118,6 @@ const AdminReviews = () => {
             }`}
           >
             All Reviews
-          </button>
-          <button
-            onClick={() => setFilter('pending')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filter === 'pending'
-                ? 'bg-amber-700 text-white'
-                : 'bg-white text-stone-600 hover:bg-stone-100'
-            }`}
-          >
-            Pending
           </button>
           <button
             onClick={() => setFilter('approved')}
@@ -198,9 +187,11 @@ const AdminReviews = () => {
                       </div>
                     </div>
                   </div>
-                  <span className={`px-3 py-1 text-xs rounded-full border font-medium ${getStatusColor(review.status)}`}>
-                    {review.status}
-                  </span>
+                  {review.status !== 'pending' && (
+                    <span className={`px-3 py-1 text-xs rounded-full border font-medium ${getStatusColor(review.status)}`}>
+                      {review.status.charAt(0).toUpperCase() + review.status.slice(1)}
+                    </span>
+                  )}
                 </div>
 
                 <div className="mb-4">

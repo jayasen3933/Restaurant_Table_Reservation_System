@@ -15,6 +15,7 @@ import AdminReviews from './pages/AdminReviews';
 import CustomerDashboard from './pages/CustomerDashboard';
 import Support from './pages/Support';
 import Profile from './pages/Profile';
+import TableManagement from './pages/TableManagement';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
               <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
               <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
               <Route path="/admin/reviews" element={<ProtectedRoute><AdminReviews /></ProtectedRoute>} />
+              <Route path="/tables" element={<ProtectedRoute><TableManagement /></ProtectedRoute>} />
             </Routes>
           </div>
         </div>

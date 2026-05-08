@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { reservationService } from '../api/reservationService';
-import { Calendar, Clock, Users, CheckCircle, UtensilsCrossed } from 'lucide-react';
+import { Calendar, Clock, Users, CheckCircle, UtensilsCrossed, Sparkles } from 'lucide-react';
+import { getTableInfo } from '../data/tableData';
 
 const Booking = () => {
   const location = useLocation();
@@ -166,8 +167,18 @@ const Booking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 overflow-x-hidden w-full max-w-[100vw]">
-      <div className="bg-stone-900 py-6 md:py-10">
+    <div className="min-h-screen relative overflow-x-hidden w-full max-w-[100vw]">
+      {/* Warm Theme Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50"></div>
+        <div className="absolute top-0 left-0 w-full h-full opacity-20">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-amber-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-96 h-96 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-20 left-40 w-96 h-96 bg-red-300 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+        </div>
+      </div>
+      
+      <div className="relative bg-stone-900 py-6 md:py-10">
         <div className="container mx-auto px-4 max-w-full">
           <div className="max-w-4xl mx-auto w-full">
             <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-3 md:mb-4">
@@ -234,61 +245,131 @@ const Booking = () => {
               {!showContactForm ? (
                 allTables.map((table) => {
                   const isAvailable = availableTables.some(t => t._id === table._id);
+                  const tableInfo = getTableInfo(table.tableNumber);
                   return (
                     <div
                       key={table._id}
-                      className={`glass-card rounded-xl md:rounded-2xl p-4 md:p-6 hover:shadow-xl transition-all ${
+                      className={`relative backdrop-blur-xl bg-white/80 border border-amber-200/30 rounded-xl md:rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 ${
                         isAvailable 
-                          ? 'hover:border-amber-300 cursor-pointer group' 
+                          ? 'hover:border-amber-400/50 hover:bg-white/90 cursor-pointer group' 
                           : 'opacity-60 border-stone-300 cursor-not-allowed'
                       }`}
                       onClick={() => isAvailable && handleTableSelect(table)}
                     >
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className={`font-serif text-lg md:text-xl font-semibold transition-colors ${
-                            isAvailable 
-                              ? 'text-stone-800 group-hover:text-amber-800' 
-                              : 'text-stone-500'
-                          }`}>
-                            Table {table.tableNumber}
-                          </h3>
-                          <p className="text-sm text-stone-500 mt-1">
-                            Seats up to {table.capacity} guests
-                          </p>
-                        </div>
-                        <span className={`px-3 py-1 text-xs rounded-full border font-medium ${
+                      {/* Frosted Glass Glow Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-100/20 via-orange-50/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                      <div className="absolute inset-0 rounded-xl md:rounded-2xl ring-1 ring-inset ring-amber-300/20 group-hover:ring-amber-400/40 transition-all duration-300"></div>
+                      {/* Table Image */}
+                      <div className="relative h-48 overflow-hidden">
+                        <img
+                          src={tableInfo.image}
+                          alt={tableInfo.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          onError={(e) => {
+                            e.target.src = tableInfo.fallbackImage || 'https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=800&q=80';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                        
+                        {/* Status Badge */}
+                        <span className={`absolute top-4 right-4 px-3 py-1 text-xs rounded-full border font-medium backdrop-blur-sm ${
                           isAvailable 
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                            : 'bg-red-50 text-red-700 border-red-200'
+                            ? 'bg-emerald-600/80 text-white border-emerald-400/50' 
+                            : 'bg-red-600/80 text-white border-red-400/50'
                         }`}>
                           {isAvailable ? 'Available' : 'Reserved'}
                         </span>
+                        
+                        {/* Capacity Badge */}
+                        <div className="absolute bottom-4 left-4 backdrop-blur-md bg-stone-900/60 text-white px-3 py-1.5 rounded-lg text-sm font-semibold border border-white/20">
+                          <Users size={14} className="inline mr-1.5" />
+                          {tableInfo.capacity} Capacity
+                        </div>
                       </div>
-                      <button 
-                        className={`w-full text-center text-sm py-2.5 rounded-lg transition-all ${
-                          isAvailable 
-                            ? 'btn-primary' 
-                            : 'bg-stone-300 text-stone-500 cursor-not-allowed'
-                        }`}
-                        disabled={!isAvailable}
-                      >
-                        {isAvailable ? 'Select This Table' : 'Reserved'}
-                      </button>
+
+                      {/* Table Info */}
+                      <div className="relative p-4 md:p-6 bg-gradient-to-b from-white/50 to-white/30 backdrop-blur-sm">
+                        <div className="mb-3">
+                          <h3 className={`font-serif text-lg md:text-xl font-semibold transition-colors mb-1 drop-shadow-sm ${
+                            isAvailable 
+                              ? 'text-amber-900 group-hover:text-amber-700' 
+                              : 'text-stone-500'
+                          }`}>
+                            Table {table.tableNumber}: {tableInfo.title}
+                          </h3>
+                          <p className="text-xs text-amber-700/70 font-medium">
+                            Seats up to {table.capacity} guests
+                          </p>
+                        </div>
+                        
+                        {/* Description */}
+                        <p className="text-sm text-stone-700 mb-4 line-clamp-3 leading-relaxed">
+                          {tableInfo.description}
+                        </p>
+                        
+                        {/* Features */}
+                        {tableInfo.features && tableInfo.features.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {tableInfo.features.map((feature, idx) => (
+                              <span key={idx} className="inline-flex items-center gap-1 text-xs bg-amber-100/80 text-amber-800 px-2.5 py-1 rounded-full border border-amber-300/50 backdrop-blur-sm shadow-sm">
+                                <Sparkles size={10} className="text-amber-600" />
+                                {feature}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        
+                        <button 
+                          className={`w-full text-center text-sm py-2.5 rounded-lg transition-all ${
+                            isAvailable 
+                              ? 'btn-primary' 
+                              : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                          }`}
+                          disabled={!isAvailable}
+                        >
+                          {isAvailable ? 'Select This Table' : 'Reserved'}
+                        </button>
+                      </div>
                     </div>
                   );
                 })
               ) : (
                 <div className="col-span-1 md:col-span-2">
-                  <div className="glass-card rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8">
-                    <div className="mb-4 md:mb-6">
-                      <h2 className="font-serif text-xl md:text-2xl font-semibold text-stone-800 mb-2">
-                        Complete Your Reservation
-                      </h2>
-                      <p className="text-sm text-stone-500">
-                        Table {selectedTable.tableNumber} &middot; Seats {selectedTable.capacity} guests
-                      </p>
+                  <div className="relative backdrop-blur-xl bg-white/80 border border-amber-200/30 rounded-xl md:rounded-2xl overflow-hidden shadow-2xl">
+                    {/* Frosted Glass Glow */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-100/30 via-orange-50/20 to-transparent pointer-events-none"></div>
+                    <div className="absolute inset-0 rounded-xl md:rounded-2xl ring-1 ring-inset ring-amber-300/30"></div>
+                    {/* Selected Table Preview */}
+                    <div className="relative h-64 overflow-hidden">
+                      <img
+                        src={getTableInfo(selectedTable.tableNumber).image}
+                        alt={getTableInfo(selectedTable.tableNumber).title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const fallback = getTableInfo(selectedTable.tableNumber).fallbackImage;
+                          e.target.src = fallback || 'https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=800&q=80';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                      <div className="absolute bottom-6 left-6 right-6 text-white">
+                        <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-2">
+                          Table {selectedTable.tableNumber}: {getTableInfo(selectedTable.tableNumber).title}
+                        </h2>
+                        <p className="text-sm text-white/90">
+                          {getTableInfo(selectedTable.tableNumber).description}
+                        </p>
+                      </div>
                     </div>
+                    
+                    <div className="p-4 sm:p-6 md:p-8">
+                      <div className="mb-4 md:mb-6">
+                        <h3 className="font-serif text-xl font-semibold text-stone-800 mb-2">
+                          Complete Your Reservation
+                        </h3>
+                        <p className="text-sm text-stone-500">
+                          Capacity: {getTableInfo(selectedTable.tableNumber).capacity} &middot; Seats {selectedTable.capacity} guests
+                        </p>
+                      </div>
 
                     <form onSubmit={handleBooking} className="space-y-4">
                       <div>
@@ -357,6 +438,7 @@ const Booking = () => {
                         </button>
                       </div>
                     </form>
+                    </div>
                   </div>
                 </div>
               )}

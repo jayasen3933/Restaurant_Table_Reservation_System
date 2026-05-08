@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Table Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #2196F3;
+            background: #f8f9fa;
+        }
+        .upload-area.dragover {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        #preview {
+            margin-top: 20px;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        canvas:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .canvas-container {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .canvas-label {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        .success {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍽️ Restaurant Table Image Extractor</h1>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Upload your composite table image (the one with all 8 tables)</li>
+                <li>The tool will automatically split it into 8 individual images</li>
+                <li>Click on each image to download it</li>
+                <li>Save each image as <code>table1.jpg</code>, <code>table2.jpg</code>, etc.</li>
+                <li>Place all images in <code>frontend/public/tables/</code> folder</li>
+            </ol>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <h3>📤 Drop your image here or click to browse</h3>
+            <p>Supported formats: JPG, PNG</p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div id="preview"></div>
+        <div id="success" class="success">✅ Images ready! Click on each to download.</div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const successMsg = document.getElementById('success');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                processImage(file);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                processImage(file);
+            }
+        });
+
+        function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    extractTables(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function extractTables(img) {
+            preview.innerHTML = '<h3>📸 Extracted Table Images (Click to Download):</h3>';
+            
+            // Calculate dimensions for 4x2 grid
+            const cols = 4;
+            const rows = 2;
+            const cellWidth = img.width / cols;
+            const cellHeight = img.height / rows;
+
+            const tableNames = [
+                'Table 1 - Intimate Corner Booth (1-2 Capacity)',
+                'Table 2 - Quiet Booth Setting (2-3 Capacity)',
+                'Table 3 - Elegant L-Shaped Booth (3-4 Capacity)',
+                'Table 4 - Window View Table (4 Capacity)',
+                'Table 5 - Premium Round Table (5 Capacity)',
+                'Table 6 - Cityscape Dining (6 Capacity)',
+                'Table 7 - Grand Crystal Room (7 Capacity)',
+                'Table 8 - Formal Banquet Table (8 Capacity)'
+            ];
+
+            let index = 0;
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = cellWidth;
+                    canvas.height = cellHeight;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Extract the portion of the image
+                    ctx.drawImage(
+                        img,
+                        col * cellWidth, row * cellHeight, cellWidth, cellHeight,
+                        0, 0, cellWidth, cellHeight
+                    );
+
+                    const container = document.createElement('div');
+                    container.className = 'canvas-container';
+                    
+                    const label = document.createElement('span');
+                    label.className = 'canvas-label';
+                    label.textContent = tableNames[index];
+                    
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.textContent = `Download table${index + 1}.jpg`;
+                    downloadBtn.onclick = () => downloadCanvas(canvas, `table${index + 1}.jpg`);
+                    
+                    container.appendChild(canvas);
+                    container.appendChild(label);
+                    container.appendChild(downloadBtn);
+                    preview.appendChild(container);
+                    
+                    index++;
+                }
+            }
+            
+            successMsg.style.display = 'block';
+        }
+
+        function downloadCanvas(canvas, filename) {
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 'image/jpeg', 0.95);
+        }
+    </script>
+</body>
+</html>

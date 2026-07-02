@@ -2,7 +2,8 @@ const express = require('express');
 const { 
   getAllTables, 
   createTable, 
-  deleteTable 
+  deleteTable,
+  initTables
 } = require('../controllers/tableController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -12,7 +13,11 @@ router.route('/')
   .get(getAllTables)
   .post(protect, authorize('admin'), createTable);
 
+router.route('/init')
+  .post(initTables);
+
 router.route('/:id')
   .delete(protect, authorize('admin'), deleteTable);
 
 module.exports = router;
+

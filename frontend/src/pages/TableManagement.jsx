@@ -1,72 +1,20 @@
 import React from 'react';
+import { tableDescriptions, CAPACITY_MAP } from '../data/tableData';
 
 const TableManagement = () => {
-  const tables = [
-    {
-      id: 1,
-      currentGuests: 4,
-      capacity: '1-2',
-      title: 'Table 1 (1-2 Capacity)',
-      description: 'An intimate, cozy corner booth featuring plush velvet seating and rich, dark wood paneling. Illuminated by a warm, modern glass pendant light, this table offers a perfectly private dining experience for singles or couples.',
-      image: '/tables/1seating.PNG'
-    },
-    {
-      id: 2,
-      currentGuests: 5,
-      capacity: '2-3',
-      title: 'Table 2 (2-3 Capacity)',
-      description: 'A comfortable square table nestled in a quiet booth setting, ideal for small groups of two or three. It features a minimalist floral centerpiece and soft, ambient lighting that enhances the warm, welcoming atmosphere.',
-      image: '/tables/2seating.PNG'
-    },
-    {
-      id: 3,
-      currentGuests: 2,
-      capacity: '3-4',
-      title: 'Table 3 (3-4 Capacity)',
-      description: 'A spacious, deeply cushioned L-shaped booth set around a polished square wooden table for up to four guests. Elegant candlelight reflects off the classic wood wainscoting, creating a classic, sophisticated dining environment.',
-      image: '/tables/3seating.jpeg'
-    },
-    {
-      id: 4,
-      currentGuests: 3,
-      capacity: '4',
-      title: 'Table 4 (4 Capacity)',
-      description: 'A sleek, rectangular wooden table positioned next to floor-to-ceiling windows, offering a beautiful twilight city view. Adorned with a lush, botanical table runner, it perfectly balances modern design with a warm, natural aesthetic.',
-      image: '/tables/4seating.jpeg'
-    },
-    {
-      id: 5,
-      currentGuests: 6,
-      capacity: '5',
-      title: 'Table 5 (5 Capacity)',
-      description: 'A premium round table designed for a group of five, encouraging easy conversation. It sits beneath an oversized, warm-toned drum chandelier and is anchored by a striking, tall floral centerpiece.',
-      image: '/tables/5seating.jpeg'
-    },
-    {
-      id: 6,
-      currentGuests: 1,
-      capacity: '6',
-      title: 'Table 6 (6 Capacity)',
-      description: 'A long, elegant rectangular table seating six guests, set against stunning evening cityscapes. The warm overhead lighting, modern wooden chairs, and continuous floral runner make it perfect for medium-sized gatherings.',
-      image: '/tables/6seating.jpeg'
-    },
-    {
-      id: 7,
-      currentGuests: 8,
-      capacity: '7',
-      title: 'Table 7 (7 Capacity)',
-      description: 'An opulent, large round table accommodating up to seven guests, situated in a grand, fully wood-paneled section of the dining room. It is highlighted by a magnificent crystal chandelier and luxurious, classic decor.',
-      image: '/tables/7seating.jpeg'
-    },
-    {
-      id: 8,
-      currentGuests: 7,
-      capacity: '8',
-      title: 'Table 8 (8 Capacity)',
-      description: 'A grand, formal rectangular table draped in crisp linens, designed for larger parties of up to eight. Set beneath a brilliant classic chandelier with symmetrical, high-end floral arrangements, offering the ultimate premium dining experience.',
-      image: '/tables/8seating.jpeg'
-    }
-  ];
+  // Build tables array from the single source of truth (tableData.js)
+  const tables = Object.keys(CAPACITY_MAP).map((tableNum) => {
+    const num = parseInt(tableNum);
+    const info = tableDescriptions[num];
+    return {
+      id: num,
+      capacity: CAPACITY_MAP[num],
+      title: `Table ${num}: ${info.title}`,
+      description: info.description,
+      image: info.image,
+      features: info.features
+    };
+  });
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -119,30 +67,41 @@ const TableManagement = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                     
-                    {/* Capacity Badge */}
-                    <div className="absolute top-4 right-4 backdrop-blur-md bg-amber-900/60 text-amber-50 px-3 py-1 rounded-full text-sm font-semibold border border-amber-300/30 shadow-lg">
-                      Capacity: {table.capacity}
+                    {/* Capacity Badge - Frosted Glass */}
+                    <div
+                      className="absolute top-4 right-4 text-amber-50 px-3 py-1 rounded-full text-sm font-semibold shadow-lg"
+                      style={{
+                        backdropFilter: 'blur(12px)',
+                        background: 'rgba(255,255,255,0.15)',
+                        border: '1px solid rgba(255,255,255,0.25)'
+                      }}
+                    >
+                      {table.capacity} Capacity
                     </div>
                   </div>
 
                   {/* Content */}
                   <div className="relative p-6">
                     {/* Title */}
-                    <h3 className="text-xl font-bold text-amber-50 mb-3 drop-shadow-md font-['Playfair_Display']">
+                    <h3 className="text-xl font-bold text-amber-50 mb-2 drop-shadow-md font-['Playfair_Display']">
                       {table.title}
                     </h3>
 
-                    {/* Current Guests */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex items-center gap-2 backdrop-blur-sm bg-white/10 px-3 py-1.5 rounded-lg border border-amber-200/20">
-                        <svg className="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                        </svg>
-                        <span className="text-amber-100 font-semibold text-sm">
-                          Current Guests: <span className="text-amber-50">{table.currentGuests}</span>
-                        </span>
+                    {/* Seats subtitle */}
+                    <p className="text-sm text-amber-200 mb-3 font-medium">
+                      Seats up to {table.capacity} {table.capacity === 1 ? 'guest' : 'guests'}
+                    </p>
+
+                    {/* Features */}
+                    {table.features && table.features.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {table.features.map((feature, idx) => (
+                          <span key={idx} className="text-xs bg-amber-400/15 text-amber-200 px-2 py-0.5 rounded-full border border-amber-300/20">
+                            {feature}
+                          </span>
+                        ))}
                       </div>
-                    </div>
+                    )}
 
                     {/* Description */}
                     <p className="text-amber-100/90 text-sm leading-relaxed line-clamp-4 group-hover:line-clamp-none transition-all duration-300">

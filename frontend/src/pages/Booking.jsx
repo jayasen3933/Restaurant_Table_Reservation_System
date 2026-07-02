@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { reservationService } from '../api/reservationService';
 import { Calendar, Clock, Users, CheckCircle, UtensilsCrossed, Sparkles } from 'lucide-react';
-import { getTableInfo } from '../data/tableData';
+import { getTableInfo, CAPACITY_MAP } from '../data/tableData';
 
 const Booking = () => {
   const location = useLocation();
@@ -280,8 +280,8 @@ const Booking = () => {
                           {isAvailable ? 'Available' : 'Reserved'}
                         </span>
                         
-                        {/* Capacity Badge */}
-                        <div className="absolute bottom-4 left-4 backdrop-blur-md bg-stone-900/60 text-white px-3 py-1.5 rounded-lg text-sm font-semibold border border-white/20">
+                        {/* Capacity Badge - Frosted Glass */}
+                        <div className="absolute bottom-4 left-4 text-white px-3 py-1.5 rounded-lg text-sm font-semibold" style={{ backdropFilter: 'blur(12px)', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)' }}>
                           <Users size={14} className="inline mr-1.5" />
                           {tableInfo.capacity} Capacity
                         </div>
@@ -298,7 +298,7 @@ const Booking = () => {
                             Table {table.tableNumber}: {tableInfo.title}
                           </h3>
                           <p className="text-xs text-amber-700/70 font-medium">
-                            Seats up to {table.capacity} guests
+                            Seats up to {tableInfo.capacity} {tableInfo.capacity === 1 ? 'guest' : 'guests'}
                           </p>
                         </div>
                         
@@ -367,7 +367,7 @@ const Booking = () => {
                           Complete Your Reservation
                         </h3>
                         <p className="text-sm text-stone-500">
-                          Capacity: {getTableInfo(selectedTable.tableNumber).capacity} &middot; Seats {selectedTable.capacity} guests
+                          {getTableInfo(selectedTable.tableNumber).capacity} Capacity &middot; Seats up to {getTableInfo(selectedTable.tableNumber).capacity} {getTableInfo(selectedTable.tableNumber).capacity === 1 ? 'guest' : 'guests'}
                         </p>
                       </div>
 
